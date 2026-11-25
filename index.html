@@ -1,0 +1,2097 @@
+<!doctype html>
+<html lang="es-VE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Cotiza en dólares y cobra en bolívares al ritmo del BCV. Catálogo, cuentas de pago y mensaje listo para WhatsApp.">
+<meta name="theme-color" content="#f3f6f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08120e" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VentaFácil">
+<title>VentaFácil VZ — Cotizaciones por WhatsApp</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --bg: #f3f6f2;
+  --bg-accent: #e3f0e6;
+  --surface: #ffffff;
+  --surface-2: #f6f9f7;
+  --surface-3: #eef4ef;
+  --ink: #0c2118;
+  --muted: #5b6f65;
+  --line: #dce6df;
+  --line-strong: #c6d5cb;
+  --brand: #0e7a52;
+  --brand-strong: #07583b;
+  --brand-soft: #e2f3e9;
+  --on-brand: #ffffff;
+  --wa: #0b7f4f;
+  --danger: #b3261e;
+  --danger-soft: #fdeceb;
+  --warn: #8a5100;
+  --warn-bg: #fff3dc;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(9, 40, 28, .05), 0 14px 36px -22px rgba(9, 40, 28, .30);
+  --maxw: 700px;
+  --safe-l: max(16px, env(safe-area-inset-left));
+  --safe-r: max(16px, env(safe-area-inset-right));
+  color-scheme: light dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #08120e;
+    --bg-accent: #0d1f17;
+    --surface: #101d17;
+    --surface-2: #0c1813;
+    --surface-3: #14261d;
+    --ink: #e9f3ee;
+    --muted: #9bb1a5;
+    --line: #21362b;
+    --line-strong: #2d4638;
+    --brand: #47cf92;
+    --brand-strong: #8cebbd;
+    --brand-soft: #123326;
+    --on-brand: #04140d;
+    --wa: #2fbd7c;
+    --danger: #ff8a80;
+    --danger-soft: #331611;
+    --warn: #ffc46b;
+    --warn-bg: #2c2210;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 20px 44px -26px rgba(0, 0, 0, .85);
+  }
+}
+html { -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--ink);
+  background: radial-gradient(900px 520px at 85% -8%, var(--bg-accent), transparent 68%), var(--bg);
+  background-attachment: fixed;
+  font-size: 16px;
+  line-height: 1.45;
+}
+[hidden] { display: none !important; }
+img, svg { display: block; }
+button, input, select, textarea { font: inherit; }
+button { color: inherit; }
+a { color: var(--brand); }
+h1, h2, h3, p { margin: 0; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: 2px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: 12px; top: -60px; z-index: 100;
+  background: var(--surface); color: var(--ink); padding: 10px 14px;
+  border-radius: 10px; border: 1px solid var(--line);
+}
+.skip-link:focus { top: 12px; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px var(--safe-r) 9px var(--safe-l);
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand img { width: 38px; height: 38px; border-radius: 11px; box-shadow: 0 4px 12px -6px rgba(7, 83, 60, .6); }
+.brand__name { font-size: 17px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+.brand__name span { color: var(--brand); }
+.brand__tag { display: block; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+.rate-chip {
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 1px;
+  min-height: 44px; padding: 5px 11px; border: 1px solid var(--line); border-radius: 13px;
+  background: var(--surface); cursor: pointer; text-align: right;
+}
+.rate-chip:active { transform: translateY(1px); }
+.rate-chip__label { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.rate-chip strong { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.rate-chip__meta { font-size: 10px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); flex: none; }
+.dot[data-tone="stale"], .dot[data-tone="warn"] { background: #e2a33d; }
+.dot[data-tone="missing"] { background: var(--danger); }
+.dot[data-tone="loading"] { background: var(--muted); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+/* ---------- Shell ---------- */
+main {
+  width: min(var(--maxw), 100%);
+  margin: 0 auto;
+  padding: 18px var(--safe-r) calc(96px + env(safe-area-inset-bottom)) var(--safe-l);
+}
+.view { display: flex; flex-direction: column; gap: 14px; }
+.viewhead { padding: 2px 2px 0; }
+.viewhead h1 { font-size: clamp(23px, 6.4vw, 29px); line-height: 1.12; letter-spacing: -.035em; font-weight: 800; }
+.viewhead p { margin-top: 5px; font-size: 13.5px; color: var(--muted); max-width: 52ch; }
+.eyebrow { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- Rate card ---------- */
+.rate-card {
+  position: relative; overflow: hidden; border-radius: 22px; padding: 17px 18px 15px;
+  color: #effff7;
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(37, 211, 102, .30), transparent 55%),
+    linear-gradient(140deg, #0d7c54 0%, #08553e 58%, #063427 100%);
+  box-shadow: 0 16px 38px -22px rgba(4, 51, 35, .75);
+}
+.rate-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.rate-card__head .eyebrow { color: rgba(235, 255, 246, .72); }
+.rate-card__value { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin-top: 3px; }
+.rate-card__value strong { font-size: clamp(31px, 9vw, 43px); font-weight: 800; line-height: 1.02; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.rate-card__value span { font-size: 12px; font-weight: 700; color: rgba(235, 255, 246, .74); }
+.icon-btn--onDark { width: 40px; height: 40px; flex: none; border: 1px solid rgba(255, 255, 255, .22); border-radius: 12px; background: rgba(255, 255, 255, .12); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.icon-btn--onDark:hover { background: rgba(255, 255, 255, .2); }
+.icon-btn--onDark:active { transform: translateY(1px); }
+.icon-btn--onDark[disabled] { opacity: .6; cursor: progress; }
+.rate-card__meta { display: flex; align-items: center; gap: 6px; margin-top: 9px; font-size: 11.5px; color: rgba(235, 255, 246, .78); }
+.rate-card__meta .dot { background: #6ff0b4; }
+.rate-card__meta .dot[data-tone="stale"], .rate-card__meta .dot[data-tone="warn"] { background: #ffd479; }
+.rate-card__meta .dot[data-tone="missing"] { background: #ff9d94; }
+.rate-card__source { margin-top: 2px; font-size: 11px; color: rgba(235, 255, 246, .72); }
+.rate-warn {
+  display: block;
+  margin-top: 11px; padding: 9px 11px; border-radius: 11px;
+  background: rgba(255, 212, 121, .16); border: 1px solid rgba(255, 212, 121, .34);
+  color: #ffedc7; font-size: 12px; line-height: 1.4;
+}
+.rate-warn strong { font-weight: 800; }
+.rate-warn__link {
+  border: 0; background: none; padding: 0; color: inherit; font: inherit;
+  font-weight: 800; text-decoration: underline; text-underline-offset: 2px;
+  display: block; cursor: pointer; white-space: nowrap; margin-top: 5px;
+}
+.rate-warn[data-tone="missing"] { background: rgba(255, 157, 148, .16); border-color: rgba(255, 157, 148, .4); color: #ffd9d5; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.is-spinning svg { animation: spin .9s linear infinite; }
+
+/* ---------- Panels & fields ---------- */
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px; box-shadow: var(--shadow);
+}
+.panel__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.panel__head h2 { font-size: 16px; font-weight: 750; letter-spacing: -.015em; }
+.panel > h2 { font-size: 16px; font-weight: 750; letter-spacing: -.015em; margin-bottom: 4px; }
+.panel__intro { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.hint { font-size: 12px; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > label, .field-label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+input[type="text"], input[type="search"], input[type="tel"], input[type="email"], input[type="number"], select, textarea {
+  width: 100%; min-height: 46px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--ink);
+  font-size: 15px;
+  transition: border-color .15s, box-shadow .15s;
+}
+input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--muted) 72%, transparent); }
+input[aria-invalid="true"] { border-color: var(--danger); background: var(--danger-soft); }
+.field-error { font-size: 12px; font-weight: 600; color: var(--danger); }
+.field-help { font-size: 11.5px; color: var(--muted); }
+.search-wrap { position: relative; margin-bottom: 8px; }
+.search-wrap svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; color: var(--muted); pointer-events: none; }
+.search-wrap input { padding-left: 38px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 15px; border-radius: 12px; border: 1px solid transparent;
+  font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; text-decoration: none;
+  cursor: pointer; transition: transform .06s ease, filter .15s ease, background .15s ease;
+  touch-action: manipulation;
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn svg { flex: none; }
+.btn--primary { background: var(--brand); color: var(--on-brand); }
+.btn--primary:hover { filter: brightness(1.06); }
+.btn--wa { background: var(--wa); color: #fff; }
+.btn--wa:hover { filter: brightness(1.07); }
+.btn--secondary { background: var(--surface); border-color: var(--line-strong); color: var(--ink); }
+.btn--secondary:hover { background: var(--surface-2); }
+.btn--ghost { background: transparent; color: var(--brand); }
+.btn--danger { background: var(--danger); color: #fff; }
+.btn--sm { min-height: 38px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+.btn--block { width: 100%; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .48; cursor: not-allowed; transform: none; }
+.link-btn {
+  border: 0; background: none; color: var(--brand); font-size: 12.5px; font-weight: 700;
+  padding: 4px 2px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.icon-btn {
+  width: 38px; height: 38px; flex: none; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  color: var(--muted); cursor: pointer;
+}
+.icon-btn:hover { color: var(--ink); background: var(--surface-2); }
+.icon-btn--danger:hover { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 30%, var(--line)); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions { display: grid; gap: 8px; }
+.actions .link-btn { justify-self: center; }
+@media (min-width: 520px) {
+  .actions { grid-template-columns: 1.3fr 1fr; }
+  .actions .link-btn { grid-column: 1 / -1; }
+}
+
+/* ---------- Chips ---------- */
+.chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 7px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; min-height: 32px; padding: 5px 11px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--surface-2); color: var(--muted);
+  font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+
+/* ---------- Product picker ---------- */
+.picker { list-style: none; margin: 4px 0 0; padding: 0; max-height: 310px; overflow-y: auto; overscroll-behavior: contain; }
+.pick {
+  display: flex; align-items: center; gap: 10px; padding: 8px 4px;
+  border-top: 1px solid var(--line);
+}
+.pick:first-child { border-top: 0; }
+.pick__main { min-width: 0; flex: 1; }
+.pick__name { font-size: 14.5px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+.pick__meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 2px; font-size: 11.5px; color: var(--muted); }
+.pick__price { text-align: right; flex: none; }
+.pick__price strong { display: block; font-size: 13.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pick__price span { display: block; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.add-btn {
+  width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+  border-radius: 50%; background: var(--brand-soft); color: var(--brand-strong); cursor: pointer;
+}
+.add-btn:hover { background: color-mix(in srgb, var(--brand) 18%, var(--surface)); }
+.add-btn:active { transform: scale(.95); }
+.add-btn[disabled] { opacity: .4; cursor: not-allowed; }
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2);
+  color: var(--muted); font-size: 10.5px; font-weight: 700; white-space: nowrap;
+}
+.badge--ok { background: var(--brand-soft); border-color: transparent; color: var(--brand-strong); }
+.badge--danger { background: var(--danger-soft); border-color: transparent; color: var(--danger); }
+
+/* ---------- Cart ---------- */
+.cart { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cart li { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+.cart li:first-child { border-top: 0; padding-top: 2px; }
+.cart__name { font-size: 14.5px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+.cart__unit { margin-top: 2px; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cart__total { text-align: right; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cart__bs { display: block; font-size: 10.5px; font-weight: 600; color: var(--muted); }
+.cart__controls { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
+.stepper { display: inline-flex; align-items: center; gap: 1px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); padding: 2px; }
+.stepper button {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border: 0; border-radius: 50%; background: transparent; color: var(--ink);
+  font-size: 19px; line-height: 1; cursor: pointer;
+}
+.stepper button:hover { background: var(--surface-3); }
+.stepper button[disabled] { opacity: .35; cursor: not-allowed; }
+.stepper output { min-width: 28px; text-align: center; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cart__remove { margin-left: auto; }
+
+/* ---------- Totals ---------- */
+.totals { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.totals__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+.totals__row strong { font-size: 15px; color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+.totals__row--main { border-top: 1px dashed var(--line-strong); padding-top: 11px; margin-top: 1px; }
+.totals__row--main strong { font-size: 27px; letter-spacing: -.03em; line-height: 1.1; }
+.totals__row--main span { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.totals__note { font-size: 11.5px; color: var(--muted); margin: 0; font-variant-numeric: tabular-nums; }
+.totals__note strong { color: var(--ink); font-weight: 750; }
+.totals .actions { margin-top: 2px; }
+.empty { padding: 18px 8px; text-align: center; font-size: 13px; color: var(--muted); }
+.empty strong { display: block; color: var(--ink); font-size: 14px; margin-bottom: 2px; }
+.empty .link-btn { font-size: 13px; }
+
+/* ---------- Catalog ---------- */
+.catalog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.catalog li { display: flex; align-items: center; gap: 11px; padding: 11px 0; border-top: 1px solid var(--line); }
+.catalog li:first-child { border-top: 0; padding-top: 2px; }
+.prod__main { flex: 1; min-width: 0; }
+.prod__name { font-size: 14.5px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+.prod__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 3px; font-size: 11.5px; color: var(--muted); }
+.prod__price { flex: none; text-align: right; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prod__price span { display: block; font-size: 10.5px; color: var(--muted); font-weight: 600; }
+.prod__actions { display: flex; gap: 4px; flex: none; }
+.catalog-toolbar { display: flex; flex-wrap: wrap; gap: 7px; }
+.catalog-toolbar .btn { flex: 1 1 auto; }
+
+/* ---------- Settings ---------- */
+.rate-line { display: flex; align-items: baseline; gap: 6px; margin: 4px 0 3px; }
+.rate-line strong { font-size: 25px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.rate-line span { font-size: 12px; font-weight: 650; color: var(--muted); }
+.settings-meta { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pay {
+  min-width: 0;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2);
+  padding: 12px; margin: 0 0 9px;
+}
+.pay:last-of-type { margin-bottom: 0; }
+.pay__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.pay__title { font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; }
+.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.switch input { width: 18px; height: 18px; min-height: 0; accent-color: var(--brand); margin: 0; cursor: pointer; }
+.grid2 { display: grid; gap: 10px; }
+@media (min-width: 520px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.grid2 .field--full { grid-column: 1 / -1; }
+.pay-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--muted); }
+.pay-summary strong { color: var(--ink); font-weight: 700; }
+.install-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.setting-row:first-of-type { border-top: 0; }
+.setting-row p { font-size: 13px; }
+.setting-row .field-help { margin-top: 2px; }
+.about { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+/* ---------- Tab bar ---------- */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+  padding: 7px max(10px, env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid var(--line);
+}
+.tabbar button {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 48px; border: 0; border-radius: 12px; background: none;
+  color: var(--muted); font-size: 10.5px; font-weight: 700; cursor: pointer;
+  touch-action: manipulation;
+}
+.tabbar button[aria-current="page"] { color: var(--brand); background: var(--brand-soft); }
+.tabbar svg { width: 21px; height: 21px; }
+
+/* ---------- Dialogs ---------- */
+dialog {
+  width: min(520px, calc(100vw - 28px)); max-height: min(86dvh, 760px);
+  padding: 0; border: 1px solid var(--line); border-radius: 20px;
+  background: var(--surface); color: var(--ink);
+  box-shadow: 0 30px 80px -22px rgba(0, 0, 0, .55);
+}
+dialog:modal { overscroll-behavior: contain; }
+dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); overflow: hidden; overscroll-behavior: contain; }
+.dialog__body { padding: 18px; overflow-y: auto; max-height: min(86dvh, 760px); }
+.dialog__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+.dialog__head h2 { font-size: 19px; font-weight: 800; letter-spacing: -.025em; line-height: 1.2; }
+.dialog__head p { margin-top: 3px; font-size: 12.5px; color: var(--muted); }
+.dialog__close { width: 36px; height: 36px; flex: none; }
+.dialog__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.dialog__actions .btn { flex: 1 1 auto; min-width: 120px; }
+@media (min-width: 480px) { .dialog__actions .btn { flex: 0 0 auto; } }
+.dialog__form { display: flex; flex-direction: column; gap: 12px; }
+.preview {
+  margin: 0; padding: 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface-2); white-space: pre-wrap; overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px; line-height: 1.55; max-height: 46dvh; overflow-y: auto;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 60;
+  translate: -50% 12px; opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 999px;
+  background: #0a2017; color: #f0fff7; font-size: 12.5px; font-weight: 650; text-align: center;
+  box-shadow: 0 16px 40px -16px rgba(0, 0, 0, .65);
+  transition: opacity .2s ease, translate .2s ease;
+}
+.toast.is-visible { opacity: 1; translate: -50% 0; }
+
+@media (max-width: 380px) {
+  .brand__tag { display: none; }
+}
+@media (min-width: 760px) {
+  .rate-card { padding: 20px 22px; }
+  .panel { padding: 18px; }
+  .view { gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+<header class="topbar">
+  <div class="brand">
+    <img src="icon-192.png" alt="" width="38" height="38">
+    <div>
+      <p class="brand__name">VentaFácil <span>VZ</span></p>
+      <span class="brand__tag">Cotiza · cobra · envía</span>
+    </div>
+  </div>
+  <button class="rate-chip" id="rateChip" type="button" aria-label="Ver y actualizar la tasa BCV">
+    <span class="rate-chip__label"><span class="dot" id="rateDot" data-tone="loading"></span> Tasa BCV</span>
+    <strong id="rateChipValue">—</strong>
+    <span class="rate-chip__meta" id="rateChipMeta">Consultando…</span>
+  </button>
+</header>
+
+<main id="main">
+  <!-- ============ COTIZAR ============ -->
+  <section class="view" id="view-quote" data-view="quote" aria-labelledby="quoteTitle">
+    <div class="viewhead">
+      <h1 id="quoteTitle">Nueva cotización</h1>
+      <p>Arma el pedido, revisa la tasa del día y envía el mensaje listo por WhatsApp.</p>
+    </div>
+
+    <section class="rate-card" aria-labelledby="rateCardTitle">
+      <div class="rate-card__head">
+        <div>
+          <p class="eyebrow" id="rateCardTitle">Tasa BCV de referencia</p>
+          <p class="rate-card__value"><strong data-rate-value>—</strong><span>Bs por $</span></p>
+        </div>
+        <button class="icon-btn icon-btn--onDark" id="refreshRate" type="button" aria-label="Actualizar tasa BCV" title="Actualizar tasa">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>
+          </svg>
+        </button>
+      </div>
+      <p class="rate-card__meta"><span class="dot" data-rate-dot data-tone="loading"></span><span id="rateUpdated">Consultando la tasa…</span></p>
+      <p class="rate-card__source" id="rateSource">Fuente: BCV</p>
+      <p class="rate-warn" id="rateWarn" data-tone="missing" hidden></p>
+    </section>
+
+    <section class="panel" aria-labelledby="customerTitle">
+      <div class="panel__head">
+        <h2 id="customerTitle">Cliente</h2>
+        <span class="hint">Opcional</span>
+      </div>
+      <div class="field">
+        <label for="customerName">Nombre del cliente</label>
+        <input type="text" id="customerName" name="customer" placeholder="Ej. Ana Pérez" autocomplete="name" maxlength="80" enterkeyhint="done">
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="pickTitle">
+      <div class="panel__head">
+        <h2 id="pickTitle">Agregar productos</h2>
+        <span class="hint" id="productCount"></span>
+      </div>
+      <div class="chips" id="quoteChips" role="group" aria-label="Filtrar productos por categoría"></div>
+      <div class="search-wrap">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+        </svg>
+        <label class="sr-only" for="quoteSearch">Buscar producto</label>
+        <input type="search" id="quoteSearch" placeholder="Buscar por nombre o categoría…" autocomplete="off">
+      </div>
+      <ul class="picker" id="pickerList" aria-label="Productos disponibles para cotizar"></ul>
+      <p class="empty" id="pickerEmpty" hidden>
+        <strong>Sin resultados</strong>
+        Prueba otra búsqueda o agrega el producto al catálogo.
+        <button class="link-btn" type="button" data-goto-catalog>Ir al catálogo</button>
+      </p>
+    </section>
+
+    <section class="panel" aria-labelledby="cartTitle">
+      <div class="panel__head">
+        <h2 id="cartTitle">Detalle de la cotización</h2>
+        <button class="link-btn" id="clearCart" type="button" hidden>Vaciar</button>
+      </div>
+      <ul class="cart" id="cartList" aria-label="Productos en la cotización"></ul>
+      <p class="empty" id="cartEmpty">
+        <strong>Tu cotización está vacía</strong>
+        Agrega productos con el botón + para empezar.
+      </p>
+    </section>
+
+    <section class="totals" aria-labelledby="totalsTitle">
+      <h2 class="sr-only" id="totalsTitle">Totales de la cotización</h2>
+      <div class="totals__row"><span>Subtotal USD</span><strong id="totalUsd">$0,00</strong></div>
+      <div class="totals__row totals__row--main"><span>Total en bolívares</span><strong id="totalBs">—</strong></div>
+      <p class="totals__note" id="totalsRateNote">Sin tasa configurada.</p>
+      <div class="actions">
+        <button class="btn btn--wa" id="sendWa" type="button" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z" fill="currentColor"/>
+            <path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.66.15-.2.3-.76.96-.93 1.15-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.6-.9-2.19-.24-.57-.48-.49-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.3-1.02 1-1.02 2.43s1.05 2.82 1.2 3.01c.15.2 2.06 3.15 4.99 4.42.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.56-.35z" fill="currentColor"/>
+          </svg>
+          Enviar por WhatsApp
+        </button>
+        <button class="btn btn--secondary" id="copyMsg" type="button" disabled>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+          </svg>
+          Copiar mensaje
+        </button>
+        <button class="link-btn" id="previewMsg" type="button" disabled>Vista previa del mensaje</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="paySummaryTitle">
+      <div class="panel__head">
+        <h2 id="paySummaryTitle">Formas de pago incluidas</h2>
+        <button class="link-btn" type="button" data-goto-settings>Editar</button>
+      </div>
+      <p class="pay-summary"><span id="paySummary">Ninguna configurada</span></p>
+    </section>
+  </section>
+
+  <!-- ============ CATÁLOGO ============ -->
+  <section class="view" id="view-catalog" data-view="catalog" aria-labelledby="catalogTitle" hidden>
+    <div class="viewhead">
+      <h1 id="catalogTitle">Catálogo</h1>
+      <p>Administra tus productos una vez y reutilízalos en cada cotización.</p>
+    </div>
+
+    <section class="panel">
+      <div class="catalog-toolbar">
+        <button class="btn btn--primary" id="newProduct" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo producto
+        </button>
+        <button class="btn btn--secondary" id="exportCsv" type="button">Exportar CSV</button>
+        <button class="btn btn--secondary" id="importCsv" type="button">Importar CSV</button>
+        <input type="file" id="csvInput" accept=".csv,text/csv" hidden>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="catalogListTitle">
+      <div class="panel__head">
+        <h2 id="catalogListTitle">Productos</h2>
+        <span class="hint" id="catalogCount"></span>
+      </div>
+      <div class="chips" id="catalogChips" role="group" aria-label="Filtrar catálogo por categoría"></div>
+      <div class="search-wrap">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+        </svg>
+        <label class="sr-only" for="catalogSearch">Buscar en el catálogo</label>
+        <input type="search" id="catalogSearch" placeholder="Buscar en el catálogo…" autocomplete="off">
+      </div>
+      <ul class="catalog" id="catalogList" aria-label="Productos del catálogo"></ul>
+      <p class="empty" id="catalogEmpty" hidden>
+        <strong>Sin productos</strong>
+        Agrega el primero con “Nuevo producto” o importa un CSV.
+      </p>
+    </section>
+  </section>
+
+  <!-- ============ AJUSTES ============ -->
+  <section class="view" id="view-settings" data-view="settings" aria-labelledby="settingsTitle" hidden>
+    <div class="viewhead">
+      <h1 id="settingsTitle">Ajustes</h1>
+      <p>Tasa, datos de pago y respaldo. Todo se guarda en este teléfono.</p>
+    </div>
+
+    <section class="panel" aria-labelledby="rateSettingsTitle">
+      <h2 id="rateSettingsTitle">Tasa BCV</h2>
+      <p class="panel__intro">Se consulta automáticamente al abrir la app. Si no hay conexión, usa una tasa manual.</p>
+      <p class="rate-line"><strong data-rate-value>—</strong><span>Bs por $</span></p>
+      <p class="settings-meta" id="settingsRateMeta">Sin datos de tasa.</p>
+
+      <form id="manualRateForm" class="dialog__form" style="margin-top: 13px;" novalidate>
+        <div class="field">
+          <label for="manualRate">Tasa manual (Bs por $)</label>
+          <input type="text" id="manualRate" name="manualRate" inputmode="decimal" placeholder="Ej. 918,7662" aria-describedby="manualRateHelp manualRateError">
+          <span class="field-help" id="manualRateHelp">Se guarda con la fecha de hoy y aparece en la cotización.</span>
+          <p class="field-error" id="manualRateError" hidden></p>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--primary btn--sm" type="submit">Guardar tasa manual</button>
+          <button class="btn btn--secondary btn--sm" id="refreshRateSettings" type="button">Consultar BCV</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="paySettingsTitle">
+      <h2 id="paySettingsTitle">Datos de pago</h2>
+      <p class="panel__intro">Marca los métodos que aceptas. Solo los activos aparecen en el mensaje de WhatsApp.</p>
+      <form id="paymentForm" novalidate>
+        <div id="paymentFields"></div>
+        <button class="btn btn--primary btn--block" type="submit" style="margin-top: 12px;">Guardar datos de pago</button>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="dataTitle">
+      <h2 id="dataTitle">Datos y respaldo</h2>
+      <div class="setting-row">
+        <div>
+          <p><strong>Exportar catálogo</strong></p>
+          <p class="field-help">Descarga un CSV con nombre, precio, stock y categoría.</p>
+        </div>
+        <button class="btn btn--secondary btn--sm" id="exportCsvSettings" type="button">Exportar</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <p><strong>Importar catálogo</strong></p>
+          <p class="field-help">Combina productos por nombre; actualiza precios y stock.</p>
+        </div>
+        <button class="btn btn--secondary btn--sm" id="importCsvSettings" type="button">Importar</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <p><strong>Restablecer demo</strong></p>
+          <p class="field-help">Reemplaza el catálogo con 8 productos de ejemplo. Conserva tasa y pagos.</p>
+        </div>
+        <button class="btn btn--secondary btn--sm" id="resetDemo" type="button">Restablecer</button>
+      </div>
+      <p class="about" id="appDataInfo" style="margin-top: 12px;"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="installTitle">
+      <h2 id="installTitle">Instalar en el teléfono</h2>
+      <p class="panel__intro">Abre la app sin navegador y úsala sin conexión. Requiere servirla por HTTPS o localhost.</p>
+      <button class="btn btn--primary btn--block" id="installBtn" type="button" hidden>Instalar VentaFácil</button>
+      <p class="install-note" id="installNote">En Android: menú ⋮ → “Instalar app”. En iPhone: Compartir → “Añadir a pantalla de inicio”.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle">Acerca de</h2>
+      <p class="about">
+        VentaFácil VZ funciona sin cuenta, sin servidor y sin base de datos. Los productos, la tasa y los datos de pago
+        se guardan solo en este navegador (localStorage). La tasa de referencia se consulta desde
+        DolarAPI Venezuela (BCV) y también puede ingresarse a mano. Verifica siempre la tasa oficial antes de cerrar una venta.
+      </p>
+      <p class="settings-meta" style="margin-top: 8px;">Versión 1.0 · Hecho para comercios venezolanos 🇻🇪</p>
+    </section>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Secciones principales">
+  <button type="button" data-target="quote" aria-current="page" aria-controls="view-quote">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 11.5h2M12 11.5h2M16 11.5h.01M8 16h2M12 16h2M16 16h.01"/>
+    </svg>
+    Cotizar
+  </button>
+  <button type="button" data-target="catalog" aria-controls="view-catalog">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 8.5 12 3 3 8.5v7L12 21l9-5.5z"/><path d="m3.3 8.6 8.7 5.2 8.7-5.2M12 13.8V21"/>
+    </svg>
+    Catálogo
+  </button>
+  <button type="button" data-target="settings" aria-controls="view-settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.36a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.64 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.64a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.64a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.36 9c.14.62.66 1.09 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/>
+    </svg>
+    Ajustes
+  </button>
+</nav>
+
+<dialog id="productDialog" aria-labelledby="productDialogTitle">
+  <div class="dialog__body">
+    <div class="dialog__head">
+      <div>
+        <h2 id="productDialogTitle">Nuevo producto</h2>
+        <p id="productDialogSub">Se guarda solo en este teléfono.</p>
+      </div>
+      <button class="icon-btn dialog__close" type="button" data-close-dialog aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <form id="productForm" class="dialog__form" novalidate>
+      <div class="field">
+        <label for="pName">Nombre del producto</label>
+        <input type="text" id="pName" name="name" maxlength="80" autocomplete="off" required aria-describedby="pNameError">
+        <p class="field-error" id="pNameError" hidden></p>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="pPrice">Precio en USD</label>
+          <input type="text" id="pPrice" name="price" inputmode="decimal" placeholder="0,00" autocomplete="off" required aria-describedby="pPriceError">
+          <p class="field-error" id="pPriceError" hidden></p>
+        </div>
+        <div class="field">
+          <label for="pStock">Stock</label>
+          <input type="text" id="pStock" name="stock" inputmode="numeric" placeholder="Sin límite" autocomplete="off" aria-describedby="pStockHelp pStockError">
+          <span class="field-help" id="pStockHelp">Vacío = sin límite.</span>
+          <p class="field-error" id="pStockError" hidden></p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pCategory">Categoría</label>
+        <input type="text" id="pCategory" name="category" list="categoryOptions" maxlength="40" placeholder="Ej. Alimentos" autocomplete="off">
+        <datalist id="categoryOptions"></datalist>
+      </div>
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" type="button" data-close-dialog>Cancelar</button>
+        <button class="btn btn--primary" type="submit" id="productSubmit">Guardar producto</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+  <div class="dialog__body">
+    <div class="dialog__head">
+      <div>
+        <h2 id="confirmTitle">¿Confirmar?</h2>
+        <p id="confirmMessage"></p>
+      </div>
+    </div>
+    <form method="dialog" class="dialog__actions">
+      <button class="btn btn--secondary" value="cancel" autofocus>Cancelar</button>
+      <button class="btn btn--danger" id="confirmAccept" value="confirm">Confirmar</button>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="messageDialog" aria-labelledby="messageTitle">
+  <div class="dialog__body">
+    <div class="dialog__head">
+      <div>
+        <h2 id="messageTitle">Vista previa</h2>
+        <p>Así se verá el mensaje en WhatsApp.</p>
+      </div>
+      <button class="icon-btn dialog__close" type="button" data-close-dialog aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <pre class="preview" id="previewText"></pre>
+    <div class="dialog__actions">
+      <button class="btn btn--secondary" id="previewCopy" type="button">Copiar mensaje</button>
+      <button class="btn btn--wa" id="previewSend" type="button">Enviar por WhatsApp</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- Utilities ---------- */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+  const cssEscape = (value) => (window.CSS && CSS.escape)
+    ? CSS.escape(String(value))
+    : String(value).replace(/["\\]/g, '\\$&');
+  const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+  const round4 = (n) => Math.round((Number(n) + Number.EPSILON) * 10000) / 10000;
+  const nf2 = new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const nfRate = new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  const fmtDate = new Intl.DateTimeFormat('es-VE', { dateStyle: 'medium', timeStyle: 'short' });
+  const fmtStamp = new Intl.DateTimeFormat('es-VE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const fmtDay = new Intl.DateTimeFormat('es-VE', { dateStyle: 'long' });
+  const moneyUSD = (n) => '$' + nf2.format(round2(n));
+  const moneyBs = (n) => nf2.format(round2(n)) + ' Bs';
+  const fmtRate = (n) => nfRate.format(Number(n) || 0);
+  const uid = () => (globalThis.crypto && typeof crypto.randomUUID === 'function')
+    ? crypto.randomUUID()
+    : 'p-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  const parseDate = (value) => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+  const makeTimeout = (ms) => {
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), ms);
+    return controller.signal;
+  };
+
+  function parseNum(value) {
+    if (typeof value === 'number') return value;
+    let raw = String(value ?? '').trim().replace(/[^\d.,-]/g, '');
+    if (!raw) return NaN;
+    const lastComma = raw.lastIndexOf(',');
+    const lastDot = raw.lastIndexOf('.');
+    if (lastComma > -1 && lastDot > -1) {
+      raw = lastComma > lastDot
+        ? raw.replace(/\./g, '').replace(',', '.')
+        : raw.replace(/,/g, '');
+    } else if (lastComma > -1) {
+      raw = raw.split(',').length === 2 ? raw.replace(',', '.') : raw.replace(/,/g, '');
+    }
+    return Number(raw);
+  }
+
+  /* ---------- Storage ---------- */
+  const K = {
+    products: 'vfz.products.v1',
+    settings: 'vfz.settings.v1',
+    cart: 'vfz.cart.v1'
+  };
+
+  function readStore(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (error) {
+      console.warn('No se pudo leer', key, error);
+      return fallback;
+    }
+  }
+
+  function writeStore(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      console.warn('No se pudo guardar', key, error);
+      toast('No se pudo guardar. Revisa el espacio del navegador.');
+      return false;
+    }
+  }
+
+  /* ---------- Seed data ---------- */
+  const SEED_PRODUCTS = [
+    ['Harina PAN 1 kg', 1.20, 24, 'Alimentos'],
+    ['Arroz Mary 1 kg', 1.10, 18, 'Alimentos'],
+    ['Aceite Vatel 1 L', 2.30, 12, 'Alimentos'],
+    ['Café Fama de América 500 g', 3.80, 9, 'Alimentos'],
+    ['Papel higiénico Rosal 4 rollos', 2.60, 15, 'Hogar'],
+    ['Jabón Las Llaves 250 g', 0.90, 30, 'Hogar'],
+    ['Queso blanco duro 1 kg', 6.50, 5, 'Lácteos'],
+    ['Recarga móvil 10 GB', 5.00, null, 'Servicios']
+  ];
+
+  const seedProducts = () => SEED_PRODUCTS.map(([name, price, stock, category]) => ({
+    id: uid(), name, price_usd: price, stock, category
+  }));
+
+  function normalizeProduct(product) {
+    if (!product || typeof product !== 'object') return null;
+    const name = String(product.name ?? product.nombre ?? '').trim();
+    if (!name) return null;
+    const price = parseNum(product.price_usd ?? product.precio_usd ?? product.price ?? product.precio);
+    if (!Number.isFinite(price) || price < 0) return null;
+    let stock = product.stock === null || product.stock === undefined || product.stock === ''
+      ? null
+      : Math.floor(parseNum(product.stock));
+    if (stock !== null && (!Number.isFinite(stock) || stock < 0)) stock = null;
+    return {
+      id: String(product.id || uid()),
+      name,
+      price_usd: round2(price),
+      stock,
+      category: String(product.category ?? product.categoria ?? 'General').trim() || 'General'
+    };
+  }
+
+  function loadProducts() {
+    const raw = readStore(K.products, null);
+    if (Array.isArray(raw)) return raw.map(normalizeProduct).filter(Boolean);
+    const seeded = seedProducts();
+    writeStore(K.products, seeded);
+    return seeded;
+  }
+
+  /* ---------- Payment definitions ---------- */
+  const PAY_DEFS = {
+    pagoMovil: {
+      label: 'Pago Móvil',
+      fields: [
+        { k: 'bank', label: 'Banco', placeholder: 'Ej. Banesco' },
+        { k: 'phone', label: 'Teléfono', placeholder: '0414-1234567', type: 'tel', inputmode: 'tel', autocomplete: 'tel' },
+        { k: 'id', label: 'Cédula / RIF', placeholder: 'V-12345678' },
+        { k: 'holder', label: 'Titular', placeholder: 'Ana Pérez', autocomplete: 'name' }
+      ]
+    },
+    transferencia: {
+      label: 'Transferencia',
+      fields: [
+        { k: 'bank', label: 'Banco', placeholder: 'Ej. Mercantil' },
+        { k: 'account', label: 'Número de cuenta', placeholder: '0105-0000-00-0000000000', inputmode: 'numeric' },
+        { k: 'holder', label: 'Titular', placeholder: 'Ana Pérez', autocomplete: 'name' }
+      ]
+    },
+    zelle: {
+      label: 'Zelle',
+      fields: [
+        { k: 'email', label: 'Correo o teléfono', placeholder: 'pagos@ejemplo.com', type: 'email', autocomplete: 'email' },
+        { k: 'holder', label: 'Titular', placeholder: 'Ana Pérez', autocomplete: 'name' }
+      ]
+    },
+    usdt: {
+      label: 'USDT',
+      fields: [
+        { k: 'network', label: 'Red', placeholder: 'TRC20' },
+        { k: 'address', label: 'Dirección / wallet', placeholder: 'T...' },
+        { k: 'holder', label: 'Titular', placeholder: 'Ana Pérez', autocomplete: 'name' }
+      ]
+    }
+  };
+
+  function defaultSettings() {
+    const payments = {};
+    for (const [key, def] of Object.entries(PAY_DEFS)) {
+      payments[key] = { enabled: key === 'pagoMovil' };
+      for (const field of def.fields) payments[key][field.k] = '';
+    }
+    return { rate: null, customer: '', payments };
+  }
+
+  function loadSettings() {
+    const raw = readStore(K.settings, {}) || {};
+    const defaults = defaultSettings();
+    const payments = {};
+    for (const [key, def] of Object.entries(PAY_DEFS)) {
+      const source = (raw.payments && raw.payments[key]) || {};
+      payments[key] = { ...defaults.payments[key], ...source };
+      payments[key].enabled = Boolean(payments[key].enabled);
+      for (const field of def.fields) {
+        payments[key][field.k] = typeof payments[key][field.k] === 'string' ? payments[key][field.k] : '';
+      }
+    }
+    let rate = null;
+    const storedRate = raw.rate;
+    if (storedRate && Number.isFinite(Number(storedRate.value)) && Number(storedRate.value) > 0) {
+      rate = {
+        value: round4(Number(storedRate.value)),
+        updatedAt: typeof storedRate.updatedAt === 'string' ? storedRate.updatedAt : new Date().toISOString(),
+        fetchedAt: typeof storedRate.fetchedAt === 'string' ? storedRate.fetchedAt : null,
+        source: typeof storedRate.source === 'string' ? storedRate.source : 'Tasa manual'
+      };
+    }
+    return {
+      rate,
+      customer: typeof raw.customer === 'string' ? raw.customer : '',
+      payments
+    };
+  }
+
+  const state = {
+    products: loadProducts(),
+    settings: loadSettings(),
+    cart: readStore(K.cart, {}) || {},
+    quoteCategory: 'Todos',
+    catalogCategory: 'Todos',
+    editingId: null,
+    pendingConfirm: null,
+    rateLoading: false
+  };
+
+  // Drop stale cart lines left behind by deleted products.
+  {
+    const validIds = new Set(state.products.map((p) => p.id));
+    for (const id of Object.keys(state.cart)) {
+      const qty = Math.floor(Number(state.cart[id]));
+      if (!validIds.has(id) || !Number.isFinite(qty) || qty <= 0) delete state.cart[id];
+      else state.cart[id] = qty;
+    }
+  }
+
+  const saveProducts = () => writeStore(K.products, state.products);
+  const saveSettings = () => writeStore(K.settings, state.settings);
+  const saveCart = () => writeStore(K.cart, state.cart);
+
+  /* ---------- Toasts ---------- */
+  let toastTimer;
+  function toast(message) {
+    const el = $('#toast');
+    el.textContent = message;
+    el.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('is-visible'), 3400);
+  }
+
+  /* ---------- Rate ---------- */
+  const RATE_MAX_AGE = 24 * 60 * 60 * 1000;
+  const RATE_SOURCES = [
+    {
+      url: 'https://ve.dolarapi.com/v1/dolares/oficial',
+      name: 'DolarAPI Venezuela',
+      parse: (data) => ({
+        value: Number(data && data.promedio),
+        updatedAt: (data && data.fechaActualizacion) || new Date().toISOString()
+      })
+    },
+    {
+      url: 'https://ve.dolarapi.com/v1/dolares',
+      name: 'DolarAPI Venezuela',
+      parse: (data) => {
+        const official = Array.isArray(data)
+          ? data.find((item) => String((item && item.fuente) || '').toLowerCase() === 'oficial')
+          : null;
+        if (!official) return null;
+        return {
+          value: Number(official.promedio),
+          updatedAt: official.fechaActualizacion || new Date().toISOString()
+        };
+      }
+    }
+  ];
+
+  async function fetchRate() {
+    for (const source of RATE_SOURCES) {
+      try {
+        const response = await fetch(source.url, {
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+          signal: makeTimeout(9000)
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        const parsed = source.parse(data);
+        if (!parsed || !Number.isFinite(parsed.value) || parsed.value <= 0) {
+          throw new Error('La respuesta no contiene una tasa válida');
+        }
+        return {
+          value: round4(parsed.value),
+          updatedAt: parsed.updatedAt,
+          fetchedAt: new Date().toISOString(),
+          source: 'BCV · ' + source.name
+        };
+      } catch (error) {
+        console.warn('No se pudo consultar ' + source.url, error);
+      }
+    }
+    return null;
+  }
+
+  function getRateStatus() {
+    const rate = state.settings.rate;
+    if (!rate || !(rate.value > 0)) {
+      return {
+        tone: 'missing',
+        short: 'Configurar',
+        label: 'sin configurar',
+        message: 'No hay tasa configurada. Ingrésala manualmente para cotizar en bolívares.'
+      };
+    }
+    const date = parseDate(rate.updatedAt);
+    if (!date) {
+      return {
+        tone: 'warn',
+        short: 'Sin fecha',
+        label: 'fecha desconocida',
+        message: 'La tasa no tiene fecha de actualización. Verifícala antes de cotizar.'
+      };
+    }
+    const age = Date.now() - date.getTime();
+    if (age > RATE_MAX_AGE) {
+      const days = Math.max(1, Math.floor(age / 86400000));
+      return {
+        tone: 'stale',
+        short: 'Hace ' + days + ' d',
+        label: 'tasa con ' + days + (days === 1 ? ' día' : ' días'),
+        message: 'La tasa tiene ' + days + (days === 1 ? ' día' : ' días') +
+          ' sin actualizar. Consulta el BCV o guarda la tasa de hoy antes de enviar.'
+      };
+    }
+    return { tone: 'ok', short: 'Al día', label: 'tasa al día', message: '' };
+  }
+
+  function setRateLoading(loading) {
+    state.rateLoading = loading;
+    for (const button of [$('#refreshRate'), $('#refreshRateSettings')]) {
+      if (!button) continue;
+      button.classList.toggle('is-spinning', loading);
+      button.disabled = loading;
+      if (button.id === 'refreshRateSettings') button.setAttribute('aria-busy', String(loading));
+    }
+    renderRate();
+  }
+
+  async function refreshRate({ silent = false } = {}) {
+    if (state.rateLoading) return;
+    setRateLoading(true);
+    const found = await fetchRate();
+    setRateLoading(false);
+    if (found) {
+      state.settings.rate = found;
+      saveSettings();
+      renderRate();
+      renderTotals();
+      renderPicker();
+      renderCatalog();
+      if (!silent) toast('Tasa actualizada: ' + fmtRate(found.value) + ' Bs/$');
+    } else {
+      renderRate();
+      if (!silent) {
+        toast(state.settings.rate
+          ? 'No se pudo consultar. Se mantiene la tasa guardada.'
+          : 'No se pudo consultar la tasa. Ingrésala manualmente.');
+      }
+    }
+  }
+
+  /* ---------- Formatting helpers ---------- */
+  const cartItems = () => Object.entries(state.cart)
+    .map(([id, qty]) => {
+      const product = state.products.find((p) => p.id === id);
+      return product ? { product, qty } : null;
+    })
+    .filter(Boolean);
+
+  function totals() {
+    const items = cartItems();
+    const totalUsd = items.reduce((sum, item) => sum + item.product.price_usd * item.qty, 0);
+    const rate = state.settings.rate && state.settings.rate.value ? state.settings.rate.value : 0;
+    return { usd: round2(totalUsd), bs: round2(totalUsd * rate), rate };
+  }
+
+  function paymentBits(key, payment) {
+    const bits = [];
+    const value = (prop) => String(payment[prop] || '').trim();
+    if (key === 'pagoMovil') {
+      if (value('bank')) bits.push('Banco ' + value('bank'));
+      if (value('phone')) bits.push('Tel. ' + value('phone'));
+      if (value('id')) bits.push('CI/RIF ' + value('id'));
+      if (value('holder')) bits.push('Titular ' + value('holder'));
+    } else if (key === 'transferencia') {
+      if (value('bank')) bits.push('Banco ' + value('bank'));
+      if (value('account')) bits.push('Cuenta ' + value('account'));
+      if (value('holder')) bits.push('Titular ' + value('holder'));
+    } else if (key === 'zelle') {
+      if (value('email')) bits.push(value('email'));
+      if (value('holder')) bits.push('Titular ' + value('holder'));
+    } else if (key === 'usdt') {
+      if (value('address')) bits.push(value('address'));
+      if (value('holder')) bits.push('Titular ' + value('holder'));
+    }
+    return bits;
+  }
+
+  function paymentEntries() {
+    return Object.entries(PAY_DEFS).map(([key, def]) => {
+      const payment = state.settings.payments[key] || {};
+      return { key, def, payment, bits: paymentBits(key, payment) };
+    });
+  }
+
+  function paymentMessageLines() {
+    const lines = [];
+    for (const { key, def, payment, bits } of paymentEntries()) {
+      if (!payment.enabled || !bits.length) continue;
+      const network = key === 'usdt' ? String(payment.network || '').trim() : '';
+      const label = network ? def.label + ' (' + network + ')' : def.label;
+      lines.push('• ' + label + ': ' + bits.join(' · '));
+    }
+    return lines;
+  }
+
+  /* ---------- Views ---------- */
+  function showView(name) {
+    $$('.view').forEach((view) => { view.hidden = view.dataset.view !== name; });
+    $$('.tabbar button').forEach((button) => {
+      if (button.dataset.target === name) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+    try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch { window.scrollTo(0, 0); }
+  }
+
+  /* ---------- Rate rendering ---------- */
+  function renderRate() {
+    const rate = state.settings.rate;
+    const status = getRateStatus();
+    const tone = state.rateLoading ? 'loading' : status.tone;
+    $$('[data-rate-value]').forEach((el) => { el.textContent = rate ? fmtRate(rate.value) : '—'; });
+    $$('[data-rate-dot]').forEach((el) => { el.dataset.tone = tone; });
+    if ($('#rateDot')) $('#rateDot').dataset.tone = tone;
+    $('#rateChipValue').textContent = rate ? fmtRate(rate.value) + ' Bs' : 'Sin tasa';
+    $('#rateChipMeta').textContent = state.rateLoading
+      ? 'Consultando…'
+      : (rate ? status.short : 'Configurar');
+
+    const updated = rate ? parseDate(rate.updatedAt) : null;
+    $('#rateUpdated').textContent = updated
+      ? 'Actualizada ' + fmtDate.format(updated) + ' · ' + status.label
+      : (state.rateLoading ? 'Consultando la tasa BCV…' : 'Sin fecha de actualización');
+    $('#rateSource').textContent = rate ? 'Fuente: ' + rate.source : 'Fuente: BCV (sin datos)';
+
+    const warn = $('#rateWarn');
+    if (state.rateLoading && !rate) {
+      warn.hidden = true;
+      warn.textContent = '';
+    } else if (status.tone === 'ok') {
+      warn.hidden = true;
+      warn.textContent = '';
+    } else {
+      warn.hidden = false;
+      warn.dataset.tone = status.tone;
+      warn.innerHTML = '<span><strong>' + (status.tone === 'missing' ? 'Falta la tasa' : 'Atención') + ':</strong> ' +
+        esc(status.message) + '</span><button type="button" class="rate-warn__link" data-goto-settings>Actualizar</button>';
+    }
+
+    $('#settingsRateMeta').innerHTML = rate
+      ? esc(rate.source) + '<br>Actualizada ' + fmtStamp.format(updated || new Date())
+      : 'Sin datos de tasa.';
+
+    const manualInput = $('#manualRate');
+    if (rate && document.activeElement !== manualInput) {
+      manualInput.value = String(rate.value).replace('.', ',');
+    }
+  }
+
+  /* ---------- Product lists ---------- */
+  const getCategories = () => Array.from(new Set(state.products.map((p) => p.category || 'General')))
+    .sort((a, b) => a.localeCompare(b, 'es'));
+
+  const sortedProducts = () => [...state.products].sort((a, b) =>
+    (a.category || '').localeCompare(b.category || '', 'es') ||
+    a.name.localeCompare(b.name, 'es'));
+
+  function matchesQuery(product, query) {
+    if (!query) return true;
+    const haystack = (product.name + ' ' + product.category).toLowerCase();
+    return query.toLowerCase().split(/\s+/).every((word) => haystack.includes(word));
+  }
+
+  function visibleProducts(query, category) {
+    return sortedProducts().filter((product) =>
+      (category === 'Todos' || product.category === category) &&
+      matchesQuery(product, query.trim()));
+  }
+
+  function renderChips(host, selected) {
+    const categories = ['Todos', ...getCategories()];
+    host.innerHTML = categories.map((category) =>
+      '<button type="button" class="chip" data-category="' + esc(category) + '" aria-pressed="' +
+      String(category === selected) + '">' + esc(category) + '</button>'
+    ).join('');
+  }
+
+  function stockBadge(product, inCart = 0) {
+    if (!Number.isFinite(product.stock)) return '';
+    if (product.stock <= 0) return '<span class="badge badge--danger">Agotado</span>';
+    if (inCart > 0) return '<span class="badge badge--ok">' + inCart + ' en la cotización</span>';
+    return '<span class="badge badge--ok">Stock ' + product.stock + '</span>';
+  }
+
+  function renderPicker() {
+    renderChips($('#quoteChips'), state.quoteCategory);
+    const query = $('#quoteSearch').value;
+    const list = visibleProducts(query, state.quoteCategory);
+    const rate = state.settings.rate ? state.settings.rate.value : 0;
+
+    $('#productCount').textContent = state.products.length +
+      (state.products.length === 1 ? ' producto' : ' productos');
+
+    $('#pickerList').innerHTML = list.map((product) => {
+      const inCart = state.cart[product.id] || 0;
+      const max = Number.isFinite(product.stock) ? product.stock : Infinity;
+      const soldOut = max <= 0;
+      const capped = inCart >= max;
+      const disabled = soldOut || capped;
+      return '<li class="pick">' +
+        '<div class="pick__main">' +
+          '<p class="pick__name">' + esc(product.name) + '</p>' +
+          '<p class="pick__meta"><span class="badge">' + esc(product.category) + '</span>' + stockBadge(product, inCart) + '</p>' +
+        '</div>' +
+        '<div class="pick__price"><strong>' + moneyUSD(product.price_usd) + '</strong>' +
+          (rate ? '<span>' + moneyBs(product.price_usd * rate) + '</span>' : '') +
+        '</div>' +
+        '<button type="button" class="add-btn" data-add="' + esc(product.id) + '" aria-label="Agregar ' +
+          esc(product.name) + ' a la cotización"' + (disabled ? ' disabled' : '') + '>' +
+          (capped ? '✓' : '+') +
+        '</button>' +
+      '</li>';
+    }).join('');
+
+    const empty = $('#pickerEmpty');
+    empty.hidden = list.length > 0;
+    if (!list.length) {
+      $('strong', empty).textContent = state.products.length ? 'Sin resultados' : 'Tu catálogo está vacío';
+    }
+  }
+
+  function renderCart(focus) {
+    const items = cartItems();
+    const rate = state.settings.rate ? state.settings.rate.value : 0;
+    const list = $('#cartList');
+    list.innerHTML = items.map(({ product, qty }) => {
+      const max = Number.isFinite(product.stock) ? product.stock : Infinity;
+      return '<li>' +
+        '<div>' +
+          '<p class="cart__name">' + esc(product.name) + '</p>' +
+          '<p class="cart__unit">' + qty + ' × ' + moneyUSD(product.price_usd) + ' c/u</p>' +
+        '</div>' +
+        '<div class="cart__total">' + moneyUSD(product.price_usd * qty) +
+          (rate ? '<span class="cart__bs">' + moneyBs(product.price_usd * qty * rate) + '</span>' : '') +
+        '</div>' +
+        '<div class="cart__controls">' +
+          '<div class="stepper" role="group" aria-label="Cantidad de ' + esc(product.name) + '">' +
+            '<button type="button" data-action="dec" data-id="' + esc(product.id) + '" aria-label="Quitar una unidad de ' +
+              esc(product.name) + '"' + (qty <= 1 ? ' disabled' : '') + '>−</button>' +
+            '<output>' + qty + '</output>' +
+            '<button type="button" data-action="inc" data-id="' + esc(product.id) + '" aria-label="Agregar una unidad de ' +
+              esc(product.name) + '"' + (qty >= max ? ' disabled' : '') + '>+</button>' +
+          '</div>' +
+          '<button type="button" class="icon-btn icon-btn--danger cart__remove" data-action="remove" data-id="' +
+            esc(product.id) + '" aria-label="Quitar ' + esc(product.name) + ' de la cotización">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M4 7h16M9 7V5h6v2M6.5 7l.8 12.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8L17.5 7M10 11v6M14 11v6"/>' +
+            '</svg>' +
+          '</button>' +
+        '</div>' +
+      '</li>';
+    }).join('');
+
+    $('#cartEmpty').hidden = items.length > 0;
+    $('#clearCart').hidden = items.length === 0;
+
+    if (focus) {
+      const button = list.querySelector('[data-action="' + focus.action + '"][data-id="' + cssEscape(focus.id) + '"]');
+      if (button && !button.disabled) button.focus({ preventScroll: true });
+    }
+  }
+
+  function renderTotals() {
+    const items = cartItems();
+    const t = totals();
+    const rate = state.settings.rate;
+    $('#totalUsd').textContent = moneyUSD(t.usd);
+    $('#totalBs').textContent = rate ? moneyBs(t.bs) : '—';
+    $('#totalsRateNote').innerHTML = rate
+      ? 'Tasa aplicada: <strong>' + fmtRate(rate.value) + ' Bs/$</strong> · ' + esc(rate.source)
+      : 'Sin tasa configurada. <button class="link-btn" type="button" data-goto-settings>Ingresar tasa</button>';
+    const disabled = items.length === 0 || !rate;
+    for (const selector of ['#sendWa', '#copyMsg', '#previewMsg']) $(selector).disabled = disabled;
+    $('#clearCart').hidden = items.length === 0;
+  }
+
+  function renderCatalog() {
+    renderChips($('#catalogChips'), state.catalogCategory);
+    const query = $('#catalogSearch').value;
+    const list = visibleProducts(query, state.catalogCategory);
+    const rate = state.settings.rate ? state.settings.rate.value : 0;
+
+    $('#catalogCount').textContent = state.products.length +
+      (state.products.length === 1 ? ' producto' : ' productos');
+
+    $('#catalogList').innerHTML = list.map((product) => {
+      const stockText = Number.isFinite(product.stock)
+        ? (product.stock > 0 ? 'Stock ' + product.stock : 'Agotado')
+        : 'Sin límite';
+      const stockClass = Number.isFinite(product.stock) && product.stock <= 0 ? 'badge--danger' : '';
+      return '<li>' +
+        '<div class="prod__main">' +
+          '<p class="prod__name">' + esc(product.name) + '</p>' +
+          '<p class="prod__meta"><span class="badge">' + esc(product.category) + '</span>' +
+            '<span class="badge ' + stockClass + '">' + stockText + '</span></p>' +
+        '</div>' +
+        '<div class="prod__price">' + moneyUSD(product.price_usd) +
+          (rate ? '<span>' + moneyBs(product.price_usd * rate) + '</span>' : '<span>Sin tasa</span>') +
+        '</div>' +
+        '<div class="prod__actions">' +
+          '<button type="button" class="icon-btn" data-edit="' + esc(product.id) + '" aria-label="Editar ' + esc(product.name) + '">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10z"/><path d="m13.5 6.5 4 4"/>' +
+            '</svg>' +
+          '</button>' +
+          '<button type="button" class="icon-btn icon-btn--danger" data-del="' + esc(product.id) + '" aria-label="Eliminar ' + esc(product.name) + '">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M4 7h16M9 7V5h6v2M6.5 7l.8 12.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8L17.5 7M10 11v6M14 11v6"/>' +
+            '</svg>' +
+          '</button>' +
+        '</div>' +
+      '</li>';
+    }).join('');
+
+    const empty = $('#catalogEmpty');
+    empty.hidden = list.length > 0;
+    if (!list.length) {
+      $('strong', empty).textContent = state.products.length ? 'Sin resultados' : 'Sin productos';
+    }
+
+    $('#categoryOptions').innerHTML = getCategories().map((category) =>
+      '<option value="' + esc(category) + '"></option>'
+    ).join('');
+  }
+
+  function renderPaymentSummary() {
+    const enabled = paymentEntries().filter(({ payment }) => payment.enabled);
+    const complete = enabled.filter(({ bits }) => bits.length).map(({ def }) => def.label);
+    const incomplete = enabled.filter(({ bits }) => !bits.length).map(({ def }) => def.label + ' (faltan datos)');
+    const parts = complete.concat(incomplete);
+    $('#paySummary').textContent = parts.length ? parts.join(' · ') : 'Ninguna configurada';
+  }
+
+  function updateDataInfo() {
+    try {
+      const bytes = new Blob([
+        JSON.stringify(state.products),
+        JSON.stringify(state.settings),
+        JSON.stringify(state.cart)
+      ]).size;
+      $('#appDataInfo').textContent = state.products.length + ' productos · ' +
+        (bytes / 1024).toFixed(1).replace('.', ',') + ' KB guardados en este navegador.';
+    } catch {
+      $('#appDataInfo').textContent = state.products.length + ' productos guardados en este navegador.';
+    }
+  }
+
+  function renderAll() {
+    renderRate();
+    renderPicker();
+    renderCart();
+    renderTotals();
+    renderCatalog();
+    renderPaymentSummary();
+    updateDataInfo();
+  }
+
+  /* ---------- Cart mutations ---------- */
+  function addToCart(id) {
+    const product = state.products.find((p) => p.id === id);
+    if (!product) return;
+    const max = Number.isFinite(product.stock) ? product.stock : Infinity;
+    const current = state.cart[id] || 0;
+    if (max <= 0) { toast(product.name + ' está agotado.'); return; }
+    if (current >= max) {
+      toast('Solo hay ' + max + (max === 1 ? ' unidad' : ' unidades') + ' de ' + product.name + '.');
+      return;
+    }
+    state.cart[id] = current + 1;
+    saveCart();
+    renderCart();
+    renderPicker();
+    renderTotals();
+    const next = $('#pickerList [data-add="' + cssEscape(id) + '"]');
+    if (next && !next.disabled) next.focus({ preventScroll: true });
+  }
+
+  function removeFromCart(id) {
+    delete state.cart[id];
+    saveCart();
+    renderCart();
+    renderPicker();
+    renderTotals();
+  }
+
+  /* ---------- Product dialog ---------- */
+  function setFieldError(inputId, errorId, message) {
+    const input = $('#' + inputId);
+    const error = $('#' + errorId);
+    if (message) {
+      input.setAttribute('aria-invalid', 'true');
+      error.textContent = message;
+      error.hidden = false;
+    } else {
+      input.removeAttribute('aria-invalid');
+      error.textContent = '';
+      error.hidden = true;
+    }
+  }
+
+  function openProductDialog(id) {
+    state.editingId = id || null;
+    const product = id ? state.products.find((p) => p.id === id) : null;
+    if (id && !product) return;
+    $('#productForm').reset();
+    setFieldError('pName', 'pNameError', '');
+    setFieldError('pPrice', 'pPriceError', '');
+    setFieldError('pStock', 'pStockError', '');
+    $('#productDialogTitle').textContent = product ? 'Editar producto' : 'Nuevo producto';
+    $('#productDialogSub').textContent = product
+      ? 'Los cambios se guardan en este teléfono.'
+      : 'Se guarda solo en este teléfono.';
+    $('#productSubmit').textContent = product ? 'Guardar cambios' : 'Guardar producto';
+    $('#pName').value = product ? product.name : '';
+    $('#pPrice').value = product ? String(product.price_usd).replace('.', ',') : '';
+    $('#pStock').value = product && Number.isFinite(product.stock) ? String(product.stock) : '';
+    $('#pCategory').value = product ? product.category : '';
+    const dialog = $('#productDialog');
+    if (!dialog.open) dialog.showModal();
+    requestAnimationFrame(() => $('#pName').focus());
+  }
+
+  function askConfirm({ title, message, accept = 'Confirmar', onAccept }) {
+    $('#confirmTitle').textContent = title;
+    $('#confirmMessage').textContent = message;
+    $('#confirmAccept').textContent = accept;
+    state.pendingConfirm = onAccept;
+    const dialog = $('#confirmDialog');
+    if (!dialog.open) dialog.showModal();
+  }
+
+  /* ---------- CSV ---------- */
+  function parseCsv(text) {
+    const clean = String(text).replace(/^\uFEFF/, '');
+    const firstLine = clean.split(/\r?\n/, 1)[0] || '';
+    const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
+    const rows = [];
+    let row = [];
+    let field = '';
+    let quoted = false;
+    for (let i = 0; i < clean.length; i++) {
+      const ch = clean[i];
+      if (quoted) {
+        if (ch === '"') {
+          if (clean[i + 1] === '"') { field += '"'; i++; }
+          else quoted = false;
+        } else field += ch;
+      } else if (ch === '"') {
+        quoted = true;
+      } else if (ch === delimiter) {
+        row.push(field);
+        field = '';
+      } else if (ch === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+      } else if (ch !== '\r') {
+        field += ch;
+      }
+    }
+    if (field.length || row.length) {
+      row.push(field);
+      rows.push(row);
+    }
+    return rows.filter((cells) => cells.some((cell) => cell.trim() !== ''));
+  }
+
+  function importCsvText(text) {
+    const rows = parseCsv(text);
+    if (!rows.length) return { added: 0, updated: 0 };
+    const header = rows[0].map((cell) => cell.trim().toLowerCase());
+    const hasHeader = header.some((cell) => /(nombre|name|producto|precio|price|stock|categoria|category)/.test(cell));
+    const map = { name: 0, price: 1, stock: 2, category: 3 };
+    if (hasHeader) {
+      const find = (...keys) => header.findIndex((cell) => keys.some((key) => cell === key || cell.includes(key)));
+      map.name = find('nombre', 'name', 'producto');
+      map.price = find('precio_usd', 'precio', 'price');
+      map.stock = find('stock', 'cantidad', 'existencia');
+      map.category = find('categoria', 'category', 'rubro');
+    }
+    if (map.name < 0 || map.price < 0) return { added: 0, updated: 0 };
+    const body = hasHeader ? rows.slice(1) : rows;
+    let added = 0;
+    let updated = 0;
+    for (const cells of body) {
+      const name = String(cells[map.name] ?? '').trim();
+      if (!name) continue;
+      const price = parseNum(cells[map.price]);
+      if (!Number.isFinite(price) || price < 0) continue;
+      let stock = null;
+      const rawStock = map.stock >= 0 ? String(cells[map.stock] ?? '').trim() : '';
+      if (rawStock) {
+        const parsedStock = parseNum(rawStock);
+        if (Number.isFinite(parsedStock) && parsedStock >= 0) stock = Math.floor(parsedStock);
+      }
+      const category = (map.category >= 0 ? String(cells[map.category] ?? '').trim() : '') || 'General';
+      const existing = state.products.find((product) => product.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.name = name;
+        existing.price_usd = round2(price);
+        existing.stock = stock;
+        existing.category = category;
+        updated++;
+      } else {
+        state.products.push({ id: uid(), name, price_usd: round2(price), stock, category });
+        added++;
+      }
+    }
+    return { added, updated };
+  }
+
+  const csvEscape = (value) => {
+    const text = String(value ?? '');
+    return /[",\n\r;]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+  };
+
+  function exportCsv() {
+    if (!state.products.length) { toast('No hay productos para exportar.'); return; }
+    const rows = [
+      ['nombre', 'precio_usd', 'stock', 'categoria'],
+      ...sortedProducts().map((product) => [
+        product.name,
+        product.price_usd,
+        Number.isFinite(product.stock) ? product.stock : '',
+        product.category
+      ])
+    ];
+    const csv = '\uFEFF' + rows.map((row) => row.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'catalogo-ventafacil-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    toast('Catálogo exportado.');
+  }
+
+  /* ---------- Message ---------- */
+  function buildMessage() {
+    const items = cartItems();
+    const rate = state.settings.rate;
+    const t = totals();
+    const customer = ($('#customerName').value || state.settings.customer || '').trim();
+    const lines = ['*Cotización · VentaFácil VZ*', ''];
+    if (customer) lines.push('*Cliente:* ' + customer);
+    lines.push('*Fecha:* ' + fmtDay.format(new Date()));
+    lines.push('', '*Productos*');
+    for (const { product, qty } of items) {
+      lines.push('• ' + qty + ' × ' + product.name + ' — ' + moneyUSD(product.price_usd * qty));
+    }
+    lines.push('');
+    lines.push('Subtotal: ' + moneyUSD(t.usd));
+    lines.push('*Total USD: ' + moneyUSD(t.usd) + '*');
+    if (rate) {
+      lines.push('*Total Bs: ' + moneyBs(t.bs) + '*');
+      lines.push('Tasa BCV: ' + fmtRate(rate.value) + ' Bs/$');
+      const updated = parseDate(rate.updatedAt);
+      lines.push('Tasa actualizada: ' + (updated ? fmtDate.format(updated) : 'sin fecha') + ' · ' + rate.source);
+    }
+    const paymentLines = paymentMessageLines();
+    if (paymentLines.length) {
+      lines.push('', '*Formas de pago*');
+      lines.push(...paymentLines);
+    }
+    lines.push('', 'Quedo atento a tu pedido. ¡Gracias! 🙌');
+    return lines.join('\n');
+  }
+
+  function shareWhatsApp(text) {
+    const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  function legacyCopy(text) {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.top = '0';
+    area.style.left = '0';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    area.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    area.remove();
+    if (!ok) throw new Error('No se pudo copiar');
+  }
+
+  async function copyMessage(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+      else legacyCopy(text);
+      toast('Mensaje copiado. Pégalo en WhatsApp.');
+    } catch (error) {
+      try {
+        legacyCopy(text);
+        toast('Mensaje copiado. Pégalo en WhatsApp.');
+      } catch {
+        toast('No se pudo copiar. Abre la vista previa y selecciona el texto.');
+      }
+    }
+  }
+
+  function ensureReady() {
+    if (!cartItems().length) {
+      toast('Agrega al menos un producto a la cotización.');
+      return false;
+    }
+    if (!state.settings.rate || !state.settings.rate.value) {
+      toast('Configura la tasa BCV antes de cotizar.');
+      showView('settings');
+      $('#manualRate').focus();
+      return false;
+    }
+    return true;
+  }
+
+  function openPreview() {
+    $('#previewText').textContent = buildMessage();
+    const dialog = $('#messageDialog');
+    if (!dialog.open) dialog.showModal();
+  }
+
+  /* ---------- Payment form ---------- */
+  function buildPaymentForm() {
+    const host = $('#paymentFields');
+    host.innerHTML = Object.entries(PAY_DEFS).map(([key, def]) => {
+      const fields = def.fields.map((field) => {
+        const type = field.type || 'text';
+        const autocomplete = field.autocomplete || 'off';
+        return '<div class="field">' +
+          '<label for="pay-' + key + '-' + field.k + '">' + esc(field.label) + '</label>' +
+          '<input type="' + type + '" id="pay-' + key + '-' + field.k + '" data-pay="' + key +
+            '" data-prop="' + field.k + '" placeholder="' + esc(field.placeholder || '') +
+            '" autocomplete="' + autocomplete + '"' +
+            (field.inputmode ? ' inputmode="' + field.inputmode + '"' : '') + '>' +
+        '</div>';
+      }).join('');
+      return '<fieldset class="pay">' +
+        '<legend class="sr-only">' + esc(def.label) + '</legend>' +
+        '<div class="pay__head">' +
+          '<span class="pay__title">' + esc(def.label) + '</span>' +
+          '<label class="switch"><input type="checkbox" id="pay-' + key + '-enabled"> Incluir</label>' +
+        '</div>' +
+        '<div class="grid2">' + fields + '</div>' +
+      '</fieldset>';
+    }).join('');
+
+    for (const [key, def] of Object.entries(PAY_DEFS)) {
+      const payment = state.settings.payments[key];
+      $('#pay-' + key + '-enabled').checked = Boolean(payment.enabled);
+      for (const field of def.fields) {
+        const input = $('#pay-' + key + '-' + field.k);
+        if (input) input.value = payment[field.k] || '';
+      }
+    }
+  }
+
+  /* ---------- Initialisation & events ---------- */
+  function init() {
+    buildPaymentForm();
+    $('#customerName').value = state.settings.customer;
+
+    // Navigation
+    $$('.tabbar button').forEach((button) => {
+      button.addEventListener('click', () => showView(button.dataset.target));
+    });
+    $('#rateChip').addEventListener('click', () => {
+      showView('settings');
+      requestAnimationFrame(() => $('#manualRate').focus());
+    });
+    $('#refreshRate').addEventListener('click', () => refreshRate());
+    $('#refreshRateSettings').addEventListener('click', () => refreshRate());
+
+    // Global delegated actions
+    document.addEventListener('click', (event) => {
+      const toSettings = event.target.closest('[data-goto-settings]');
+      if (toSettings) {
+        showView('settings');
+        requestAnimationFrame(() => $('#manualRate').focus());
+        return;
+      }
+      const toCatalog = event.target.closest('[data-goto-catalog]');
+      if (toCatalog) { showView('catalog'); return; }
+      const close = event.target.closest('[data-close-dialog]');
+      if (close) {
+        const dialog = close.closest('dialog');
+        if (dialog) dialog.close();
+      }
+    });
+
+    // Customer
+    let customerTimer;
+    $('#customerName').addEventListener('input', () => {
+      clearTimeout(customerTimer);
+      customerTimer = setTimeout(() => {
+        state.settings.customer = $('#customerName').value.trim();
+        saveSettings();
+        updateDataInfo();
+      }, 300);
+    });
+
+    // Search & categories
+    $('#quoteSearch').addEventListener('input', renderPicker);
+    $('#catalogSearch').addEventListener('input', renderCatalog);
+    $('#quoteChips').addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-category]');
+      if (!chip) return;
+      state.quoteCategory = chip.dataset.category;
+      renderPicker();
+    });
+    $('#catalogChips').addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-category]');
+      if (!chip) return;
+      state.catalogCategory = chip.dataset.category;
+      renderCatalog();
+    });
+
+    // Picker add & cart controls
+    $('#pickerList').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-add]');
+      if (!button) return;
+      addToCart(button.dataset.add);
+    });
+    $('#cartList').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-action]');
+      if (!button) return;
+      const { action, id } = button.dataset;
+      if (action === 'remove') { removeFromCart(id); return; }
+      const item = cartItems().find((entry) => entry.product.id === id);
+      if (!item) return;
+      const max = Number.isFinite(item.product.stock) ? item.product.stock : Infinity;
+      const nextQty = action === 'inc' ? Math.min(item.qty + 1, max) : Math.max(1, item.qty - 1);
+      if (nextQty === item.qty) return;
+      state.cart[id] = nextQty;
+      saveCart();
+      renderCart({ action, id });
+      renderPicker();
+      renderTotals();
+    });
+    $('#clearCart').addEventListener('click', () => {
+      if (!cartItems().length) return;
+      askConfirm({
+        title: '¿Vaciar la cotización?',
+        message: 'Se quitarán todos los productos. El catálogo no cambia.',
+        accept: 'Vaciar',
+        onAccept: () => {
+          state.cart = {};
+          saveCart();
+          renderCart();
+          renderPicker();
+          renderTotals();
+          toast('Cotización vaciada.');
+        }
+      });
+    });
+
+    // Send / copy / preview
+    $('#sendWa').addEventListener('click', () => {
+      if (ensureReady()) shareWhatsApp(buildMessage());
+    });
+    $('#copyMsg').addEventListener('click', () => {
+      if (ensureReady()) copyMessage(buildMessage());
+    });
+    $('#previewMsg').addEventListener('click', () => {
+      if (ensureReady()) openPreview();
+    });
+    $('#previewCopy').addEventListener('click', () => copyMessage(buildMessage()));
+    $('#previewSend').addEventListener('click', () => shareWhatsApp(buildMessage()));
+
+    // Product dialog
+    $('#newProduct').addEventListener('click', () => openProductDialog(null));
+    $('#productForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = $('#pName').value.trim();
+      const price = parseNum($('#pPrice').value);
+      const stockRaw = $('#pStock').value.trim();
+      const stock = stockRaw === '' ? null : parseNum(stockRaw);
+      const category = $('#pCategory').value.trim() || 'General';
+      let firstInvalid = null;
+
+      if (!name) {
+        setFieldError('pName', 'pNameError', 'Escribe el nombre del producto.');
+        firstInvalid = firstInvalid || 'pName';
+      } else setFieldError('pName', 'pNameError', '');
+      if (!Number.isFinite(price) || price < 0) {
+        setFieldError('pPrice', 'pPriceError', 'Escribe un precio válido en USD (0 o más).');
+        firstInvalid = firstInvalid || 'pPrice';
+      } else setFieldError('pPrice', 'pPriceError', '');
+      if (stock !== null && (!Number.isFinite(stock) || stock < 0 || !Number.isInteger(stock))) {
+        setFieldError('pStock', 'pStockError', 'Escribe un stock entero (0 o más).');
+        firstInvalid = firstInvalid || 'pStock';
+      } else setFieldError('pStock', 'pStockError', '');
+      if (firstInvalid) { $('#' + firstInvalid).focus(); return; }
+
+      const data = { name, price_usd: round2(price), stock: stock === null ? null : Math.floor(stock), category };
+      if (state.editingId) {
+        const index = state.products.findIndex((p) => p.id === state.editingId);
+        if (index > -1) state.products[index] = { ...state.products[index], ...data };
+        toast('Producto actualizado.');
+      } else {
+        state.products.push({ id: uid(), ...data });
+        toast('Producto agregado.');
+      }
+      state.editingId = null;
+      saveProducts();
+      $('#productDialog').close();
+      renderAll();
+    });
+    for (const [inputId, errorId] of [['pName', 'pNameError'], ['pPrice', 'pPriceError'], ['pStock', 'pStockError']]) {
+      $('#' + inputId).addEventListener('input', () => setFieldError(inputId, errorId, ''));
+    }
+
+    // Catalog actions
+    $('#catalogList').addEventListener('click', (event) => {
+      const edit = event.target.closest('[data-edit]');
+      if (edit) { openProductDialog(edit.dataset.edit); return; }
+      const del = event.target.closest('[data-del]');
+      if (!del) return;
+      const product = state.products.find((p) => p.id === del.dataset.del);
+      if (!product) return;
+      askConfirm({
+        title: '¿Eliminar "' + product.name + '"?',
+        message: 'Se quitará del catálogo y de la cotización actual. No se puede deshacer.',
+        accept: 'Eliminar',
+        onAccept: () => {
+          state.products = state.products.filter((p) => p.id !== product.id);
+          delete state.cart[product.id];
+          saveProducts();
+          saveCart();
+          renderAll();
+          toast('Producto eliminado.');
+        }
+      });
+    });
+
+    // Confirm dialog
+    $('#confirmDialog').addEventListener('close', () => {
+      const accepted = $('#confirmDialog').returnValue === 'confirm';
+      $('#confirmDialog').returnValue = '';
+      const action = state.pendingConfirm;
+      state.pendingConfirm = null;
+      if (accepted && typeof action === 'function') action();
+    });
+
+    // Manual rate
+    $('#manualRateForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = $('#manualRate');
+      const value = parseNum(input.value);
+      if (!Number.isFinite(value) || value <= 0) {
+        input.setAttribute('aria-invalid', 'true');
+        $('#manualRateError').textContent = 'Escribe una tasa válida mayor que 0.';
+        $('#manualRateError').hidden = false;
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      $('#manualRateError').hidden = true;
+      const now = new Date().toISOString();
+      state.settings.rate = {
+        value: round4(value),
+        updatedAt: now,
+        fetchedAt: now,
+        source: 'Tasa manual'
+      };
+      saveSettings();
+      renderRate();
+      renderTotals();
+      renderPicker();
+      renderCatalog();
+      toast('Tasa manual guardada.');
+    });
+    $('#manualRate').addEventListener('input', () => {
+      $('#manualRate').removeAttribute('aria-invalid');
+      $('#manualRateError').hidden = true;
+    });
+
+    // Payments
+    $('#paymentForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      for (const [key, def] of Object.entries(PAY_DEFS)) {
+        const payment = { enabled: $('#pay-' + key + '-enabled').checked };
+        for (const field of def.fields) {
+          payment[field.k] = $('#pay-' + key + '-' + field.k).value.trim();
+        }
+        state.settings.payments[key] = payment;
+      }
+      saveSettings();
+      renderPaymentSummary();
+      updateDataInfo();
+      toast('Datos de pago guardados.');
+    });
+
+    // CSV
+    const exportButtons = [$('#exportCsv'), $('#exportCsvSettings')];
+    exportButtons.forEach((button) => button.addEventListener('click', exportCsv));
+    const importButtons = [$('#importCsv'), $('#importCsvSettings')];
+    importButtons.forEach((button) => button.addEventListener('click', () => $('#csvInput').click()));
+    $('#csvInput').addEventListener('change', async (event) => {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const result = importCsvText(text);
+        if (!result.added && !result.updated) {
+          toast('No se encontraron productos válidos en el CSV.');
+          return;
+        }
+        saveProducts();
+        renderAll();
+        toast('CSV importado: ' + result.added + ' nuevos, ' + result.updated + ' actualizados.');
+      } catch (error) {
+        console.error('Error al importar CSV', error);
+        toast('No se pudo leer el CSV. Revisa el formato.');
+      }
+    });
+
+    // Reset demo
+    $('#resetDemo').addEventListener('click', () => {
+      askConfirm({
+        title: '¿Restablecer datos demo?',
+        message: 'Se reemplazará el catálogo con 8 productos de ejemplo y se vaciará la cotización. Tu tasa y tus datos de pago se conservan.',
+        accept: 'Restablecer',
+        onAccept: () => {
+          state.products = seedProducts();
+          state.cart = {};
+          saveProducts();
+          saveCart();
+          renderAll();
+          toast('Catálogo demo restablecido.');
+        }
+      });
+    });
+
+    // Install
+    let deferredPrompt = null;
+    const installButton = $('#installBtn');
+    const installNote = $('#installNote');
+    const revealInstall = () => {
+      installButton.hidden = false;
+      installNote.hidden = true;
+    };
+    if (typeof navigator.install === 'function') revealInstall();
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      if (typeof navigator.install !== 'function') revealInstall();
+    });
+    window.addEventListener('appinstalled', () => toast('App instalada en tu pantalla de inicio.'));
+    installButton.addEventListener('click', async () => {
+      if (installButton.getAttribute('aria-disabled') === 'true') return;
+      installButton.setAttribute('aria-disabled', 'true');
+      try {
+        if (typeof navigator.install === 'function') {
+          await navigator.install();
+          installButton.hidden = true;
+          toast('App instalada o abierta.');
+        } else if (deferredPrompt) {
+          const promptEvent = deferredPrompt;
+          deferredPrompt = null;
+          await promptEvent.prompt();
+          const choice = await promptEvent.userChoice;
+          if (choice.outcome === 'accepted') {
+            installButton.hidden = true;
+            toast('App instalada.');
+          } else {
+            toast('Instalación cancelada.');
+          }
+        } else {
+          toast('Usa el menú del navegador para instalar la app.');
+        }
+      } catch (error) {
+        if (error && error.name === 'AbortError') toast('Instalación cancelada.');
+        else {
+          console.error('Instalación', error);
+          toast('No se pudo instalar. Usa el menú del navegador.');
+        }
+      } finally {
+        installButton.removeAttribute('aria-disabled');
+      }
+    });
+
+    renderAll();
+    showView('quote');
+    refreshRate({ silent: true });
+
+    window.addEventListener('online', () => {
+      if (getRateStatus().tone !== 'ok') refreshRate({ silent: true });
+    });
+
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((error) => console.warn('Service worker', error));
+      });
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
