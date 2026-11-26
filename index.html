@@ -14,6 +14,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -415,6 +416,28 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
 }
 .toast.is-visible { opacity: 1; translate: -50% 0; }
 
+/* ---------- Recibo PDF ---------- */
+.actions__pair { display: grid; gap: 7px; grid-template-columns: 1.45fr 1fr; }
+.actions__pair .btn { font-size: 13px; padding: 0 11px; gap: 7px; white-space: nowrap; }
+@media (min-width: 520px) {
+  .actions__pair { grid-column: 1 / -1; }
+  .actions__pair .btn { font-size: 14.5px; padding: 0 15px; gap: 8px; }
+}
+#receiptDialog input[type="date"] {
+  width: 100%; min-height: 46px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--ink); font-size: 15px;
+}
+.receipt-clear {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12.5px; font-weight: 650; color: var(--muted); line-height: 1.35; cursor: pointer;
+}
+.receipt-clear input { width: 19px; height: 19px; min-height: 0; flex: none; margin: 0; accent-color: var(--brand); cursor: pointer; }
+.toast__action {
+  pointer-events: auto; margin-left: 8px; padding: 0; border: 0; background: none;
+  color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer;
+}
+
 @media (max-width: 380px) {
   .brand__tag { display: none; }
 }
@@ -520,13 +543,21 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
       <div class="totals__row totals__row--main"><span>Total en bolívares</span><strong id="totalBs">—</strong></div>
       <p class="totals__note" id="totalsRateNote">Sin tasa configurada.</p>
       <div class="actions">
-        <button class="btn btn--wa" id="sendWa" type="button" disabled>
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z" fill="currentColor"/>
-            <path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.66.15-.2.3-.76.96-.93 1.15-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.6-.9-2.19-.24-.57-.48-.49-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.3-1.02 1-1.02 2.43s1.05 2.82 1.2 3.01c.15.2 2.06 3.15 4.99 4.42.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.56-.35z" fill="currentColor"/>
-          </svg>
-          Enviar por WhatsApp
-        </button>
+        <div class="actions__pair">
+          <button class="btn btn--wa" id="sendWa" type="button" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z" fill="currentColor"/>
+              <path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.66.15-.2.3-.76.96-.93 1.15-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.51.15-.17.2-.3.3-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.6-.9-2.19-.24-.57-.48-.49-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.3-1.02 1-1.02 2.43s1.05 2.82 1.2 3.01c.15.2 2.06 3.15 4.99 4.42.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.56-.35z" fill="currentColor"/>
+            </svg>
+            Enviar por WhatsApp
+          </button>
+          <button class="btn btn--secondary" id="receiptPdf" type="button" disabled>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>
+            </svg>
+            Recibo PDF
+          </button>
+        </div>
         <button class="btn btn--secondary" id="copyMsg" type="button" disabled>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>
@@ -765,6 +796,57 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
   </div>
 </dialog>
 
+<dialog id="receiptDialog" aria-labelledby="receiptTitle" aria-describedby="receiptSub">
+  <div class="dialog__body">
+    <div class="dialog__head">
+      <div>
+        <h2 id="receiptTitle">Recibo PDF</h2>
+        <p id="receiptSub">Factura de venta con los datos de esta cotización.</p>
+      </div>
+      <button class="icon-btn dialog__close" type="button" data-close-dialog aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <form id="receiptForm" class="dialog__form" novalidate>
+      <div class="field">
+        <label for="rClient">Nombre del cliente</label>
+        <input type="text" id="rClient" maxlength="80" autocomplete="name" placeholder="Ej. Ana Pérez">
+      </div>
+      <div class="field">
+        <label for="rMethod">Método de pago</label>
+        <select id="rMethod">
+          <option value="Pago Móvil">Pago Móvil</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Zelle">Zelle</option>
+          <option value="USDT">USDT</option>
+          <option value="Efectivo $">Efectivo $</option>
+          <option value="Efectivo Bs">Efectivo Bs</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rReference">Referencia</label>
+        <input type="text" id="rReference" maxlength="40" autocomplete="off" placeholder="Opcional. Ej. 004512">
+      </div>
+      <div class="field" id="rBankField">
+        <label for="rBank">Banco</label>
+        <input type="text" id="rBank" maxlength="40" autocomplete="off" placeholder="Ej. Banesco">
+      </div>
+      <div class="field">
+        <label for="rDate">Fecha</label>
+        <input type="date" id="rDate">
+      </div>
+      <label class="receipt-clear" for="rClear">
+        <input type="checkbox" id="rClear">
+        Limpiar carrito después de generar
+      </label>
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" type="button" data-close-dialog>Cancelar</button>
+        <button class="btn btn--primary" type="submit" id="rGenerate">Generar PDF</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
@@ -927,13 +1009,16 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     }
   };
 
+  /* Payment methods offered on the PDF receipt. Declared early: defaultSettings() uses it. */
+  const RECEIPT_METHODS = ['Pago Móvil', 'Transferencia', 'Zelle', 'USDT', 'Efectivo $', 'Efectivo Bs'];
+
   function defaultSettings() {
     const payments = {};
     for (const [key, def] of Object.entries(PAY_DEFS)) {
       payments[key] = { enabled: key === 'pagoMovil' };
       for (const field of def.fields) payments[key][field.k] = '';
     }
-    return { rate: null, customer: '', payments };
+    return { rate: null, customer: '', payments, receipt: { method: RECEIPT_METHODS[0] } };
   }
 
   function loadSettings() {
@@ -958,10 +1043,14 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
         source: typeof storedRate.source === 'string' ? storedRate.source : 'Tasa manual'
       };
     }
+    const savedReceipt = raw.receipt && RECEIPT_METHODS.includes(raw.receipt.method)
+      ? { method: raw.receipt.method }
+      : { method: RECEIPT_METHODS[0] };
     return {
       rate,
       customer: typeof raw.customer === 'string' ? raw.customer : '',
-      payments
+      payments,
+      receipt: savedReceipt
     };
   }
 
@@ -992,12 +1081,21 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
 
   /* ---------- Toasts ---------- */
   let toastTimer;
-  function toast(message) {
+  function toast(message, options) {
     const el = $('#toast');
+    const opts = options || {};
     el.textContent = message;
+    if (opts.action) {
+      const action = document.createElement('button');
+      action.type = 'button';
+      action.className = 'toast__action';
+      action.dataset.waMessage = String(opts.action.text || '');
+      action.textContent = opts.action.label || 'Abrir';
+      el.appendChild(action);
+    }
     el.classList.add('is-visible');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('is-visible'), 3400);
+    toastTimer = setTimeout(() => el.classList.remove('is-visible'), opts.duration || 3400);
   }
 
   /* ---------- Rate ---------- */
@@ -1352,7 +1450,7 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
       ? 'Tasa aplicada: <strong>' + fmtRate(rate.value) + ' Bs/$</strong> · ' + esc(rate.source)
       : 'Sin tasa configurada. <button class="link-btn" type="button" data-goto-settings>Ingresar tasa</button>';
     const disabled = items.length === 0 || !rate;
-    for (const selector of ['#sendWa', '#copyMsg', '#previewMsg']) $(selector).disabled = disabled;
+    for (const selector of ['#sendWa', '#copyMsg', '#previewMsg', '#receiptPdf']) $(selector).disabled = disabled;
     $('#clearCart').hidden = items.length === 0;
   }
 
@@ -1694,6 +1792,284 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     }
   }
 
+  /* ---------- PDF receipt ---------- */
+  const BANK_METHODS = ['Pago Móvil', 'Transferencia'];
+  const METHOD_KEYS = { 'Pago Móvil': 'pagoMovil', 'Transferencia': 'transferencia', 'Zelle': 'zelle', 'USDT': 'usdt' };
+
+  // Dot thousands, comma decimals: 2126.01 -> "2.126,01"
+  function numText(value, decimals) {
+    const parts = (Number(value) || 0).toFixed(decimals).split('.');
+    return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + parts[1];
+  }
+  const bcvNumber = (value) => numText(value, 2);
+  const bcvBs = (value) => bcvNumber(value) + ' Bs';
+  const usdText = (value) => '$' + bcvNumber(value);
+  const bcvRateText = (value) => numText(value, 4);
+
+  function isoToday() {
+    const now = new Date();
+    const pad = (value) => String(value).padStart(2, '0');
+    return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  }
+
+  function receiptFileDate(dateISO) {
+    const parts = String(dateISO || isoToday()).split('-');
+    return parts[2] + parts[1] + parts[0].slice(2);
+  }
+
+  function receiptDayLabel(dateISO) {
+    const date = parseDate(String(dateISO || isoToday()) + 'T12:00:00') || new Date();
+    return fmtDay.format(date);
+  }
+
+  function savedMethod() {
+    const saved = state.settings.receipt;
+    return saved && RECEIPT_METHODS.includes(saved.method) ? saved.method : RECEIPT_METHODS[0];
+  }
+
+  function bankForMethod(method) {
+    const key = METHOD_KEYS[method];
+    const payment = key ? state.settings.payments[key] : null;
+    return payment && typeof payment.bank === 'string' ? payment.bank : '';
+  }
+
+  function syncBankField() {
+    const needsBank = BANK_METHODS.includes($('#rMethod').value);
+    $('#rBankField').hidden = !needsBank;
+    if (needsBank && !$('#rBank').value.trim()) $('#rBank').value = bankForMethod($('#rMethod').value);
+  }
+
+  function openReceiptDialog() {
+    if (!ensureReady()) return;
+    $('#rClient').value = ($('#customerName').value || state.settings.customer || '').trim();
+    $('#rMethod').value = savedMethod();
+    $('#rReference').value = '';
+    $('#rBank').value = bankForMethod($('#rMethod').value);
+    $('#rDate').value = isoToday();
+    $('#rClear').checked = false;
+    syncBankField();
+    const dialog = $('#receiptDialog');
+    if (!dialog.open) dialog.showModal();
+    requestAnimationFrame(() => $('#rClient').focus());
+  }
+
+  function generateReceipt() {
+    const JsPDF = window.jspdf && window.jspdf.jsPDF;
+    if (typeof JsPDF !== 'function') {
+      toast('jsPDF no disponible sin conexión');
+      return;
+    }
+    const items = cartItems();
+    const rate = state.settings.rate;
+    if (!items.length || !rate) {
+      toast('La cotización no está lista para el recibo.');
+      return;
+    }
+
+    const sums = totals();
+    const clientName = $('#rClient').value.trim();
+    const method = $('#rMethod').value;
+    const reference = $('#rReference').value.trim();
+    const bank = BANK_METHODS.includes(method) ? $('#rBank').value.trim() : '';
+    const typedDate = $('#rDate').value;
+    const dateISO = /^\d{4}-\d{2}-\d{2}$/.test(typedDate) ? typedDate : isoToday();
+
+    const doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210;
+    const M = 16;
+    const CW = W - M * 2;
+    const TEAL = [14, 122, 82];
+    const INK = [12, 33, 24];
+    const GREY = [91, 111, 101];
+    const RULE = [220, 230, 223];
+    const SOFT = [246, 249, 247];
+    const stamp = parseDate(rate.updatedAt);
+    const setInk = (rgb) => doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(19);
+    setInk(TEAL);
+    doc.text('VENTAFÁCIL VZ', M, 25);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.6);
+    setInk(GREY);
+    doc.text('Cotiza · cobra · envía', M, 30.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12.5);
+    setInk(INK);
+    doc.text('Factura de Venta', W - M, 24, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    setInk(GREY);
+    doc.text(receiptDayLabel(dateISO), W - M, 30, { align: 'right' });
+    doc.setDrawColor(TEAL[0], TEAL[1], TEAL[2]);
+    doc.setLineWidth(0.7);
+    doc.line(M, 35, W - M, 35);
+
+    // Client
+    doc.setFontSize(7.8);
+    setInk(GREY);
+    doc.text('CLIENTE', M, 43);
+    doc.text('FECHA', W - M, 43, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
+    setInk(INK);
+    doc.text(clientName || 'Cliente ocasional', M, 49.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(receiptDayLabel(dateISO), W - M, 49.5, { align: 'right' });
+
+    // Rate used
+    doc.setFontSize(7.8);
+    setInk(GREY);
+    doc.text('TASA BCV APLICADA', M, 57);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    setInk(TEAL);
+    doc.text(bcvRateText(rate.value) + ' Bs por $', M, 63);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.2);
+    setInk(GREY);
+    doc.text((stamp ? 'Actualizada ' + fmtStamp.format(stamp) : 'Sin fecha de actualización') + ' · ' + rate.source,
+      W - M, 63, { align: 'right' });
+
+    // Items table
+    const COLS = [
+      { label: 'PRODUCTO', w: 76, align: 'left' },
+      { label: 'CANT', w: 16, align: 'right' },
+      { label: 'P. UNIT USD', w: 28, align: 'right' },
+      { label: 'TOTAL USD', w: 28, align: 'right' },
+      { label: 'TOTAL Bs', w: 30, align: 'right' }
+    ];
+    const colX = (index) => {
+      let x = M;
+      for (let i = 0; i < index; i += 1) x += COLS[i].w;
+      return x;
+    };
+    const cellX = (index) => (COLS[index].align === 'right'
+      ? colX(index) + COLS[index].w - 2.4
+      : colX(index) + 2.6);
+
+    const drawHead = (atY) => {
+      doc.setFillColor(SOFT[0], SOFT[1], SOFT[2]);
+      doc.rect(M, atY, CW, 8.2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.8);
+      setInk(GREY);
+      COLS.forEach((col, index) => {
+        doc.text(col.label, cellX(index), atY + 5.4, { align: col.align });
+      });
+      return atY + 8.2;
+    };
+
+    let cursor = drawHead(70);
+    items.forEach(({ product, qty }, index) => {
+      const lineTotal = product.price_usd * qty;
+      const nameLines = doc.splitTextToSize(product.name, COLS[0].w - 6);
+      const rowH = Math.max(9.6, nameLines.length * 4.3 + 5.2);
+      if (cursor + rowH > 244) {
+        doc.addPage();
+        cursor = drawHead(20);
+      }
+      if (index % 2 === 1) {
+        doc.setFillColor(SOFT[0], SOFT[1], SOFT[2]);
+        doc.rect(M, cursor, CW, rowH, 'F');
+      }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.4);
+      setInk(INK);
+      doc.text(nameLines, M + 2.6, cursor + 5.9);
+      const cells = [String(qty), usdText(product.price_usd), usdText(lineTotal), bcvBs(lineTotal * rate.value)];
+      cells.forEach((value, colIndex) => {
+        doc.setFont('helvetica', colIndex === 2 ? 'bold' : 'normal');
+        doc.text(value, cellX(colIndex + 1), cursor + 5.9, { align: 'right' });
+      });
+      cursor += rowH;
+    });
+    doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+    doc.setLineWidth(0.3);
+    doc.line(M, cursor, M + CW, cursor);
+
+    // Totals
+    if (cursor > 214) {
+      doc.addPage();
+      cursor = 24;
+    }
+    const totalsY = cursor + 11;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.6);
+    setInk(GREY);
+    doc.text('Subtotal USD', M + CW - 42, totalsY, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    setInk(INK);
+    doc.text(usdText(sums.usd), M + CW, totalsY, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    setInk(GREY);
+    doc.text('Total en bolívares', M + CW - 42, totalsY + 9, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13.5);
+    setInk(TEAL);
+    doc.text(bcvBs(sums.bs), M + CW, totalsY + 9.5, { align: 'right' });
+
+    // Payment details
+    let payY = totalsY + 24;
+    if (payY + 20 > 264) {
+      doc.addPage();
+      payY = 24;
+    }
+    doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+    doc.setLineWidth(0.3);
+    doc.line(M, payY - 7, M + CW, payY - 7);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.8);
+    setInk(GREY);
+    doc.text('DATOS DE PAGO', M, payY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    setInk(INK);
+    const payLines = ['Método: ' + method];
+    if (reference) payLines.push('Referencia: ' + reference);
+    if (bank) payLines.push('Banco: ' + bank);
+    doc.text(payLines, M, payY + 6.5);
+    const contentEnd = payY + 6.5 + (payLines.length - 1) * 5.6;
+
+    // Footer
+    if (contentEnd > 266) doc.addPage();
+    const footY = 283;
+    doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+    doc.line(M, footY - 9, M + CW, footY - 9);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.4);
+    setInk(TEAL);
+    doc.text('Gracias por su compra • VentaFácil VZ', W / 2, footY, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.6);
+    setInk(GREY);
+    doc.text('Tasa BCV de referencia. Confirma siempre la tasa oficial antes de cerrar la venta.',
+      W / 2, footY + 4.8, { align: 'center' });
+
+    doc.save('Recibo-VentaFacil-' + receiptFileDate(dateISO) + '.pdf');
+
+    // Remember the payment method for next time
+    state.settings.receipt = { method };
+    saveSettings();
+
+    if ($('#rClear').checked) {
+      state.cart = {};
+      saveCart();
+      renderCart();
+      renderPicker();
+      renderTotals();
+    }
+
+    $('#receiptDialog').close();
+    toast('Recibo generado ', {
+      action: { label: 'Enviar por WA', text: 'Adjunto tu recibo de compra' },
+      duration: 9000
+    });
+  }
+
   function ensureReady() {
     if (!cartItems().length) {
       toast('Agrega al menos un producto a la cotización.');
@@ -1860,6 +2236,19 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     });
     $('#previewCopy').addEventListener('click', () => copyMessage(buildMessage()));
     $('#previewSend').addEventListener('click', () => shareWhatsApp(buildMessage()));
+
+    // Receipt PDF
+    $('#receiptPdf').addEventListener('click', openReceiptDialog);
+    $('#rMethod').addEventListener('change', syncBankField);
+    $('#receiptForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      generateReceipt();
+    });
+    $('#toast').addEventListener('click', (event) => {
+      const action = event.target.closest('[data-wa-message]');
+      if (!action) return;
+      shareWhatsApp(action.dataset.waMessage || 'Adjunto tu recibo de compra');
+    });
 
     // Product dialog
     $('#newProduct').addEventListener('click', () => openProductDialog(null));

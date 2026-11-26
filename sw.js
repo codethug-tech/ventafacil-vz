@@ -2,7 +2,7 @@
    Caches the app shell so it opens offline after the first visit.
    The BCV rate endpoint is cross-origin and always goes to the network;
    the app keeps the last rate in localStorage as its offline fallback. */
-const CACHE = 'ventafacil-vz-v1';
+const CACHE = 'ventafacil-vz-v2';
 const SHELL = [
   './',
   './index.html',

@@ -96,6 +96,24 @@ tasa manual se guarda con la fecha del momento y se identifica como
 El mensaje incluye cada línea con cantidad y precio, subtotal y total en USD,
 total en Bs, la tasa usada con su fecha y fuente, y las formas de pago activas.
 
+## Recibo PDF (factura)
+
+En el detalle de la cotización, junto a **Enviar por WhatsApp**, está el botón
+**Recibo PDF**. Abre un formulario para elegir cliente, método de pago (Pago Móvil,
+Transferencia, Zelle, USDT, Efectivo $ o Efectivo Bs), referencia, banco (solo para
+Pago Móvil y Transferencia) y fecha. Al generar, descarga un PDF A4 con el
+encabezado, la tasa BCV aplicada con su fecha y fuente, la tabla de productos
+(cantidad, precio unitario en USD, total en USD y total en Bs), los totales y los
+datos de pago.
+
+- Nombre del archivo: `Recibo-VentaFacil-DDMMYY.pdf`.
+- El método de pago elegido se recuerda para la próxima vez.
+- La opción **Limpiar carrito después de generar** vacía la cotización al terminar.
+- Después de generarlo aparece el aviso **Recibo generado** con un enlace
+  **Enviar por WA** que abre WhatsApp con el texto “Adjunto tu recibo de compra”.
+- El PDF se arma con jsPDF (CDN). Sin conexión, la app avisa
+  “jsPDF no disponible sin conexión” y no genera el archivo.
+
 ## Catálogo CSV
 
 Columnas: `nombre,precio_usd,stock,categoria`.
