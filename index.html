@@ -437,6 +437,10 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
   pointer-events: auto; margin-left: 8px; padding: 0; border: 0; background: none;
   color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer;
 }
+.share-actions { display: grid; gap: 8px; }
+.share-note { margin-top: 13px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.share-note--ios { margin-top: 6px; color: var(--warn); font-weight: 650; }
+.share-file { margin-top: 10px; font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
 
 @media (max-width: 380px) {
   .brand__tag { display: none; }
@@ -844,6 +848,29 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
         <button class="btn btn--primary" type="submit" id="rGenerate">Generar PDF</button>
       </div>
     </form>
+  </div>
+</dialog>
+
+<dialog id="shareDialog" aria-labelledby="shareTitle" aria-describedby="shareSub">
+  <div class="dialog__body">
+    <div class="dialog__head">
+      <div>
+        <h2 id="shareTitle">Recibo generado</h2>
+        <p id="shareSub">Elige cómo enviárselo al cliente.</p>
+      </div>
+      <button class="icon-btn dialog__close" type="button" data-close-dialog aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="share-actions">
+      <button class="btn btn--primary btn--block" id="shareNative" type="button" hidden>📤 Compartir con…</button>
+      <button class="btn btn--secondary btn--block" id="shareDownload" type="button">📥 Descargar PDF</button>
+      <button class="btn btn--secondary btn--block" id="shareCopy" type="button">📋 Copiar mensaje</button>
+      <button class="btn btn--wa btn--block" id="shareWhats" type="button">💬 Abrir WhatsApp</button>
+    </div>
+    <p class="share-note" id="shareNote">Descarga el PDF y adjúntalo manualmente en tu chat de WhatsApp.</p>
+    <p class="share-note share-note--ios" id="shareNoteIos" hidden>En iOS: descarga el PDF, luego adjúntalo en WhatsApp manualmente.</p>
+    <p class="share-file" id="shareFile"></p>
   </div>
 </dialog>
 
@@ -2049,7 +2076,12 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     doc.text('Tasa BCV de referencia. Confirma siempre la tasa oficial antes de cerrar la venta.',
       W / 2, footY + 4.8, { align: 'center' });
 
-    doc.save('Recibo-VentaFacil-' + receiptFileDate(dateISO) + '.pdf');
+    const filename = 'Recibo-VentaFacil-' + receiptFileDate(dateISO) + '.pdf';
+    doc.save(filename);
+
+    // Keep the generated PDF in memory so it can be re-downloaded or shared as a file.
+    lastPdf = { blob: doc.output('blob'), filename, file: null, createdAt: Date.now() };
+    lastPdf.file = buildPdfFile(lastPdf.blob, filename);
 
     // Remember the payment method for next time
     state.settings.receipt = { method };
@@ -2064,10 +2096,84 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     }
 
     $('#receiptDialog').close();
-    toast('Recibo generado ', {
-      action: { label: 'Enviar por WA', text: 'Adjunto tu recibo de compra' },
-      duration: 9000
-    });
+    toast('Recibo generado', { duration: 4000 });
+    openShareDialog();
+  }
+
+  /* ---------- Sharing the receipt ---------- */
+  const SHARE_COPY_TEXT = '¡Hola! Adjunto tu recibo de compra 🧾 Por favor confirma al recibir. Gracias por tu compra ✨';
+  const SHARE_WA_TEXT = 'Hola! Aquí tienes el resumen de tu compra. El recibo PDF fue descargado.';
+
+  // { blob, filename, file } of the last generated receipt.
+  let lastPdf = null;
+
+  const isIOSDevice = () => /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  function buildPdfFile(blob, filename) {
+    try {
+      return new File([blob], filename, { type: 'application/pdf' });
+    } catch (error) {
+      console.warn('No se pudo crear el archivo del recibo', error);
+      return null;
+    }
+  }
+
+  function canSharePdfFile() {
+    if (!lastPdf || !lastPdf.file) return false;
+    try {
+      return typeof navigator.canShare === 'function' && navigator.canShare({ files: [lastPdf.file] });
+    } catch {
+      return false;
+    }
+  }
+
+  function downloadPdf() {
+    if (!lastPdf) {
+      toast('Genera el recibo primero.');
+      return;
+    }
+    const url = URL.createObjectURL(lastPdf.blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = lastPdf.filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('PDF descargado.');
+  }
+
+  function openShareDialog() {
+    const canShare = canSharePdfFile();
+    $('#shareNative').hidden = !canShare;
+    $('#shareNoteIos').hidden = !(isIOSDevice() && !canShare);
+    $('#shareNote').textContent = canShare
+      ? 'Con “Compartir con…” el PDF se adjunta solo: elige WhatsApp en la hoja de compartir.'
+      : 'Descarga el PDF y adjúntalo manualmente en tu chat de WhatsApp.';
+    $('#shareFile').textContent = lastPdf ? 'Archivo: ' + lastPdf.filename : '';
+    const dialog = $('#shareDialog');
+    if (!dialog.open) dialog.showModal();
+  }
+
+  async function sharePdf() {
+    if (!lastPdf || !lastPdf.file) {
+      toast('Este navegador no adjunta archivos. Descarga el PDF y adjúntalo.');
+      return;
+    }
+    try {
+      await navigator.share({
+        title: 'Recibo VentaFácil',
+        text: 'Recibo de compra',
+        files: [lastPdf.file]
+      });
+      toast('Recibo compartido.');
+      $('#shareDialog').close();
+    } catch (error) {
+      if (error && error.name === 'AbortError') return;
+      console.warn('Compartir', error);
+      toast('No se pudo compartir. Descarga el PDF y adjúntalo.');
+    }
   }
 
   function ensureReady() {
@@ -2249,6 +2355,12 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
       if (!action) return;
       shareWhatsApp(action.dataset.waMessage || 'Adjunto tu recibo de compra');
     });
+
+    // Share flow after generating the receipt
+    $('#shareDownload').addEventListener('click', downloadPdf);
+    $('#shareCopy').addEventListener('click', () => copyMessage(SHARE_COPY_TEXT));
+    $('#shareWhats').addEventListener('click', () => shareWhatsApp(SHARE_WA_TEXT));
+    $('#shareNative').addEventListener('click', sharePdf);
 
     // Product dialog
     $('#newProduct').addEventListener('click', () => openProductDialog(null));
