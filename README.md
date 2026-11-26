@@ -110,12 +110,12 @@ datos de pago.
 - El método de pago elegido se recuerda para la próxima vez.
 - La opción **Limpiar carrito después de generar** vacía la cotización al terminar.
 - Al terminar se abre el diálogo **Recibo generado** con estas acciones:
-  - **📤 Compartir con…** (solo si el navegador permite adjuntar archivos, p. ej.
+  - **Compartir con…** (solo si el navegador permite adjuntar archivos, p. ej.
     Chrome en Android): abre la hoja de compartir del sistema con el PDF adjunto;
     al elegir WhatsApp el archivo se envía listo.
-  - **📥 Descargar PDF**: vuelve a descargar el recibo (por si se perdió).
-  - **📋 Copiar mensaje**: copia un texto corto para pegar en el chat junto al PDF.
-  - **💬 Abrir WhatsApp**: abre `wa.me` con el resumen escrito. WhatsApp no permite
+  - **Descargar PDF**: vuelve a descargar el recibo (por si se perdió).
+  - **Copiar mensaje**: copia un texto corto para pegar en el chat junto al PDF.
+  - **Abrir WhatsApp**: abre `wa.me` con el resumen escrito. WhatsApp no permite
     adjuntar archivos por enlace, así que el PDF se adjunta a mano.
 - En iOS Safari no existe compartir archivos: la app muestra el aviso
   “En iOS: descarga el PDF, luego adjúntalo en WhatsApp manualmente”.
