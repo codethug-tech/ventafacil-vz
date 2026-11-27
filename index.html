@@ -438,6 +438,8 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
   color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer;
 }
 .share-actions { display: grid; gap: 8px; }
+.share-steps { display: grid; gap: 4px; margin: 12px 0 0; padding-left: 20px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.share-steps li::marker { color: var(--brand); font-weight: 700; }
 .share-note { margin-top: 13px; font-size: 12px; line-height: 1.45; color: var(--muted); }
 .share-note--ios { margin-top: 6px; color: var(--warn); font-weight: 650; }
 .share-file { margin-top: 10px; font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
@@ -868,6 +870,11 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
       <button class="btn btn--secondary btn--block" id="shareCopy" type="button">Copiar mensaje</button>
       <button class="btn btn--wa btn--block" id="shareWhats" type="button">Abrir WhatsApp</button>
     </div>
+    <ol class="share-steps" id="shareSteps">
+      <li>Descarga el PDF con el primer botón.</li>
+      <li>Abre WhatsApp y elige el chat del cliente.</li>
+      <li>Toca el clip y adjunta el PDF desde Descargas.</li>
+    </ol>
     <p class="share-note" id="shareNote">Descarga el PDF y adjúntalo manualmente en tu chat de WhatsApp.</p>
     <p class="share-note share-note--ios" id="shareNoteIos" hidden>En iOS: descarga el PDF, luego adjúntalo en WhatsApp manualmente.</p>
     <p class="share-file" id="shareFile"></p>
@@ -2121,11 +2128,41 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
 
   function canSharePdfFile() {
     if (!lastPdf || !lastPdf.file) return false;
+    if (typeof navigator.share !== 'function') return false;
+    // Some browsers share files but do not expose canShare(): try anyway.
+    if (typeof navigator.canShare !== 'function') return true;
     try {
-      return typeof navigator.canShare === 'function' && navigator.canShare({ files: [lastPdf.file] });
+      return navigator.canShare({ files: [lastPdf.file] });
     } catch {
       return false;
     }
+  }
+
+  // Copy without its own toast, so the caller can explain the next step.
+  async function copyTextQuiet(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      legacyCopy(text);
+      return true;
+    } catch {
+      try {
+        legacyCopy(text);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  async function openWhatsAppForReceipt() {
+    shareWhatsApp(SHARE_WA_TEXT);
+    const copied = await copyTextQuiet(SHARE_COPY_TEXT);
+    toast(copied
+      ? 'Mensaje copiado. Adjunta el PDF desde Descargas.'
+      : 'Recuerda adjuntar el PDF descargado en el chat.');
   }
 
   function downloadPdf() {
@@ -2147,6 +2184,7 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
   function openShareDialog() {
     const canShare = canSharePdfFile();
     $('#shareNative').hidden = !canShare;
+    $('#shareSteps').hidden = canShare;
     $('#shareNoteIos').hidden = !(isIOSDevice() && !canShare);
     $('#shareNote').textContent = canShare
       ? 'Con “Compartir con…” el PDF se adjunta solo: elige WhatsApp en la hoja de compartir.'
@@ -2172,7 +2210,9 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     } catch (error) {
       if (error && error.name === 'AbortError') return;
       console.warn('Compartir', error);
-      toast('No se pudo compartir. Descarga el PDF y adjúntalo.');
+      // Show the manual route as well, in case the sheet cannot attach files.
+      $('#shareSteps').hidden = false;
+      toast('No se pudo compartir el archivo. Descarga el PDF y adjúntalo.');
     }
   }
 
@@ -2359,7 +2399,7 @@ dialog::backdrop { background: rgba(4, 18, 12, .58); -webkit-backdrop-filter: bl
     // Share flow after generating the receipt
     $('#shareDownload').addEventListener('click', downloadPdf);
     $('#shareCopy').addEventListener('click', () => copyMessage(SHARE_COPY_TEXT));
-    $('#shareWhats').addEventListener('click', () => shareWhatsApp(SHARE_WA_TEXT));
+    $('#shareWhats').addEventListener('click', openWhatsAppForReceipt);
     $('#shareNative').addEventListener('click', sharePdf);
 
     // Product dialog
